@@ -8,10 +8,16 @@ def main():
     pg.display.set_icon(pg.image.load("widechora.png"))
     pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
     screen = pg.display.set_mode((1000,500))
-     
+    width, height = pg.display.get_window_size()
+    def sw():
+        print()
+    def sh():
+        print()
+
+
     running = True
     
-    # Cube = cObject()
+    
 
     # main loop
     while running:
@@ -24,8 +30,10 @@ def main():
                 running = False
      
      
-# run the main function only if this module is executed as the main script
-# (if you import this as a module then nothing is executed)
+
+
+
+
+
 if __name__=="__main__":
-    # call the main function
     main()
