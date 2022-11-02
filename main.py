@@ -9,10 +9,10 @@ def main():
     pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
     screen = pg.display.set_mode((1000,500))
     width, height = pg.display.get_window_size()
-    def sw():
-        print()
-    def sh():
-        print()
+    def sw(coord):
+        return coord*width 
+    def sh(coord):
+        return coord*height
 
 
     running = True
