@@ -1,4 +1,3 @@
-from turtle import width
 from functiondef import *
 import pygame as pg
  
@@ -9,9 +8,9 @@ def main():
     pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
     screen = pg.display.set_mode((1000,500))
     width, height = pg.display.get_window_size()
-    def sw(coord):
-        return coord*width 
-    def sh(coord):
+    def w(coord):
+        return coord*width
+    def h(coord):
         return coord*height
 
 
