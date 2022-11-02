@@ -31,7 +31,7 @@ def cProject(vertex, cameraPos, cameraRot, focalLength, shiftX=0, shiftY=0):
     return np.array([projectedX, projectedY])
 
 class cObject:
-    def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable) -> None:
+    def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable):
         self.pos = position
         self.rot = rotation
         self.scl = scale
