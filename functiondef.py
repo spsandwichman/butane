@@ -1,5 +1,5 @@
 import pygame as pg
-import numpy as np
+from numpy import *
 
 class Object:
 	def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable):
@@ -14,26 +14,26 @@ class Object:
 	def applyPosition(self):
 		for vertex in self.vertexTable:
 			vertex = translateVertex(vertex, self.pos)
-		self.pos = np.array([0, 0, 0])
+		self.pos = array([0, 0, 0])
 	
 	def applyRotation(self):
 		for vertex in self.vertexTable:
 			vertex = rotateVertex(vertex, self.pos, self.rot)
-		self.rot = np.array([0, 0, 0])
+		self.rot = array([0, 0, 0])
 	
 	def applyScale(self):
 		for vertex in self.vertexTable:
 			vertex = scaleVertex(vertex, self.pos, self.scl)
-		self.scl = np.array([0, 0, 0])
+		self.scl = array([0, 0, 0])
 
 class Empty:
-	def __init__(self, position = np.array([0,0,0]), rotation = np.array([0,0,0]), scale = np.array([0,0,0])):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0])):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
 
 class Camera:
-	def __init__(self, position = np.array([0,0,0]), rotation = np.array([0,0,0]), scale = np.array([0,0,0]), focalLength = 1, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0]), focalLength = 1, shiftX = 0, shiftY = 0):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
@@ -47,24 +47,24 @@ def translateVertex(vertex, trn):
 def rotateVertex(vertex, origin, rot):
 
 
-	xRotMatrix = np.array([
-		[1,               0,              0], # x-axis rotation matrix
-		[0,  np.cos(rot[0]), np.sin(rot[0])],
-		[0, -np.sin(rot[0]), np.cos(rot[0])],
+	xRotMatrix = array([
+		[1,            0,           0], # x-axis rotation matrix
+		[0,  cos(rot[0]), sin(rot[0])],
+		[0, -sin(rot[0]), cos(rot[0])],
 	])
-	yRotMatrix = np.array([
-		[np.cos(rot[1]), 0, -np.sin(rot[1])], # y-axis rotation matrix
-		[             0, 1,               0],
-		[np.sin(rot[1]), 0,  np.cos(rot[1])],
+	yRotMatrix = array([
+		[cos(rot[1]), 0, -sin(rot[1])], # y-axis rotation matrix
+		[          0, 1,            0],
+		[sin(rot[1]), 0,  cos(rot[1])],
 	])
-	zRotMatrix = np.array([
-		[ np.cos(rot[2]), np.sin(rot[2]), 0], # z-axis rotation matrix
-		[-np.sin(rot[2]), np.cos(rot[2]), 0],
-		[              0,              0, 1],
+	zRotMatrix = array([
+		[ cos(rot[2]), sin(rot[2]), 0], # z-axis rotation matrix
+		[-sin(rot[2]), cos(rot[2]), 0],
+		[           0,           0, 1],
 	])
-	RotMatrix = np.matmul(np.matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
 
-	return (np.matmul((vertex - origin).T, RotMatrix).T) + origin # magic
+	return (matmul((vertex - origin).T, RotMatrix).T) + origin # magic
 
 def scaleVertex(vertex, origin, scl): 
 	return ((vertex-origin)*scl)+origin
@@ -76,14 +76,14 @@ def project(vertex, camera):
 	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
 	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
 
-	return np.array([projectedX, projectedY])
+	return array([projectedX, projectedY])
 
 
 Cube = Object(
-	np.array([0,0,0]),	#position
-	np.array([0,0,0]),	#rotation
-	np.array([1,1,1]),	#scale
-	np.array([			#vertex table
+	array([0,0,0]),		#position
+	array([0,0,0]),		#rotation
+	array([1,1,1]),		#scale
+	array([				#vertex table
 		[-1,-1,-1],			#0
 		[-1,-1, 1],			#1
 		[-1, 1,-1],			#2
@@ -92,7 +92,7 @@ Cube = Object(
 		[ 1,-1, 1],			#5
 		[ 1, 1,-1],			#6
 		[ 1, 1, 1]]),		#7
-	np.array([         #edge table
+	array([      	   #edge table
 		[0,1],				#0
 		[0,2],				#1
 		[0,4],				#2
@@ -111,7 +111,7 @@ Cube = Object(
 		[4,7],				#15
 		[5,7],				#16
 		[6,7]]),			#17
-	np.array([			#surface table
+	array([				#surface table
 		[ 0, 1, 3],			#0
 		[ 0, 2, 5],			#1
 		[ 1, 2, 9],			#2

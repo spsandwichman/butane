@@ -1,2 +1,2 @@
 TODO:
-    try 'from numpy import *' instead of 'import numpy as np' to reduce clutter
+    get wireframe rendering working

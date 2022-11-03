@@ -1,12 +1,12 @@
 from functiondef import *
 import pygame as pg
-import numpy as np
+from numpy import *
 
 def main():
 
     resolution = (1000,500)
     width, height = resolution
-    screen = np.full((width,height,3), 0, dtype=np.uint8)
+    screen = full((width,height,3), 0, dtype=uint8)
 
 
     pg.init()
