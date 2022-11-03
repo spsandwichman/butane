@@ -1,43 +1,6 @@
 import pygame as pg
 import numpy as np
 
-def translateVertex(vertex, trn):
-	return vertex+trn
-
-def rotateVertex(vertex, origin, rot):
-
-
-	xRotMatrix = np.array([
-		[1,               0,              0], # x-axis rotation matrix
-		[0,  np.cos(rot[0]), np.sin(rot[0])],
-		[0, -np.sin(rot[0]), np.cos(rot[0])],
-	])
-	yRotMatrix = np.array([
-		[np.cos(rot[1]), 0, -np.sin(rot[1])], # y-axis rotation matrix
-		[             0, 1,               0],
-		[np.sin(rot[1]), 0,  np.cos(rot[1])],
-	])
-	zRotMatrix = np.array([
-		[ np.cos(rot[2]), np.sin(rot[2]), 0], # z-axis rotation matrix
-		[-np.sin(rot[2]), np.cos(rot[2]), 0],
-		[              0,              0, 1],
-	])
-	RotMatrix = np.matmul(np.matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
-
-	return (np.matmul((vertex - origin).T, RotMatrix).T) + origin # magic
-
-def scaleVertex(vertex, origin, scl): 
-	return ((vertex-origin)*scl)+origin
-
-def compoundProject(vertex, cameraPos, cameraRot, focalLength, shiftX=0, shiftY=0, ):
-
-	rotatedVertex = rotateVertex(vertex, cameraPos, cameraRot)	#transform into camera space
-
-	projectedX = ( ( focalLength / rotatedVertex[2] ) * rotatedVertex[0] ) + shiftX		#project onto view plane
-	projectedY = ( ( focalLength / rotatedVertex[2] ) * rotatedVertex[1] ) + shiftY		#project onto view plane
-
-	return np.array([projectedX, projectedY])
-
 class Object:
 	def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable):
 		self.pos = position
@@ -77,6 +40,44 @@ class Camera:
 		self.fL = focalLength
 		self.sX = shiftX
 		self.sY = shiftY
+
+def translateVertex(vertex, trn):
+	return vertex+trn
+
+def rotateVertex(vertex, origin, rot):
+
+
+	xRotMatrix = np.array([
+		[1,               0,              0], # x-axis rotation matrix
+		[0,  np.cos(rot[0]), np.sin(rot[0])],
+		[0, -np.sin(rot[0]), np.cos(rot[0])],
+	])
+	yRotMatrix = np.array([
+		[np.cos(rot[1]), 0, -np.sin(rot[1])], # y-axis rotation matrix
+		[             0, 1,               0],
+		[np.sin(rot[1]), 0,  np.cos(rot[1])],
+	])
+	zRotMatrix = np.array([
+		[ np.cos(rot[2]), np.sin(rot[2]), 0], # z-axis rotation matrix
+		[-np.sin(rot[2]), np.cos(rot[2]), 0],
+		[              0,              0, 1],
+	])
+	RotMatrix = np.matmul(np.matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+
+	return (np.matmul((vertex - origin).T, RotMatrix).T) + origin # magic
+
+def scaleVertex(vertex, origin, scl): 
+	return ((vertex-origin)*scl)+origin
+
+def project(vertex, camera):
+
+	rotatedVertex = rotateVertex(vertex, camera.pos, camera.rot)	#transform into camera space
+
+	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
+	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
+
+	return np.array([projectedX, projectedY])
+
 
 Cube = Object(
 	np.array([0,0,0]),	#position

@@ -1,2 +1,2 @@
 TODO:
-    in compoundProject() replace individual camera data inputs with camera object
+    try 'from numpy import *' instead of 'import numpy as np' to reduce clutter
