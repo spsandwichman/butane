@@ -16,15 +16,6 @@ def main():
     
 
     camera = Camera()
-    
-
-    def w(coord):
-        return int(coord*width)
-    def h(coord):
-        return int(coord*height)
-
-
-
 
 
 
