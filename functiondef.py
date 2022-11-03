@@ -25,6 +25,13 @@ class Object:
 		for vertex in self.vertexTable:
 			vertex = scaleVertex(vertex, self.pos, self.scl)
 		self.scl = array([0, 0, 0])
+	
+	def projectAll(self, camera):
+		projectedVertexTable = zeros((len(self.vertexTable), 2))
+		for i in range(len(self.vertexTable)):
+			projectedVertexTable[i] = project(self.vertexTable[i], camera)
+		return projectedVertexTable
+
 
 class Empty:
 	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0])):
@@ -45,7 +52,6 @@ def translateVertex(vertex, trn):
 	return vertex+trn
 
 def rotateVertex(vertex, origin, rot):
-
 
 	xRotMatrix = array([
 		[1,            0,           0], # x-axis rotation matrix

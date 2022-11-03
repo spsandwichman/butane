@@ -17,7 +17,9 @@ def main():
 
     camera = Camera()
 
+    camera.rot = array([10,-4.5,0])
 
+    print(Cube.projectAll(camera))
 
 
 
