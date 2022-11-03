@@ -1,0 +1,2 @@
+TODO:
+    in compoundProject() replace individual camera data inputs with camera object

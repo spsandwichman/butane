@@ -1,5 +1,6 @@
 from functiondef import *
 import pygame as pg
+import numpy as np
  
 def main():
 
@@ -8,6 +9,9 @@ def main():
     pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
     screen = pg.display.set_mode((1000,500), pg.RESIZABLE)
     width, height = pg.display.get_window_size()
+
+    camera = Camera()
+    
 
     def w(coord):
         return int(coord*width)
