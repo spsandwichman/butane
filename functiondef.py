@@ -26,11 +26,7 @@ class Object:
 			vertex = scaleVertex(vertex, self.pos, self.scl)
 		self.scl = array([0, 0, 0])
 	
-	def projectAll(self, camera):
-		projectedVertexTable = zeros((len(self.vertexTable), 2))
-		for i in range(len(self.vertexTable)):
-			projectedVertexTable[i] = project(self.vertexTable[i], camera)
-		return projectedVertexTable
+	
 
 
 class Empty:
@@ -84,6 +80,11 @@ def project(vertex, camera):
 
 	return array([projectedX, projectedY])
 
+def projectAll(vertexTable, camera):
+		projectedVertexTable = zeros((len(vertexTable), 2))
+		for i in range(len(vertexTable)):
+			projectedVertexTable[i] = project(vertexTable[i], camera)
+		return projectedVertexTable
 
 Cube = Object(
 	array([0,0,0]),		#position
