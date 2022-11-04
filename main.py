@@ -16,16 +16,6 @@ def main():
 	
 
 	camera = Camera()
-	
-
-
-
-
-
-
-
-
-
 
 
 

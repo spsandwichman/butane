@@ -130,6 +130,38 @@ Cube = Object(
 		[ 9,10,14],			#8
 		[10,11,17],			#9
 		[13,15,16],			#10
-		[14,15,17],			#11
-	])
+		[14,15,17]])		#11
 )
+
+Pyramid = Object(
+	array([0,0,0]),		#position
+	array([0,0,0]),		#rotation
+	array([1,1,1]),		#scale
+	array([				#vertex table
+		[-1,-1,-1],			#0
+		[-1, 1,-1],			#1
+		[ 1,-1,-1],			#2
+		[ 1, 1,-1],			#3
+		[ 0, 0, 1]]),		#4
+	array([				#edge table
+		[0,1],				#0
+		[0,2],				#1
+		[0,3],				#2
+		[0,4],				#3
+		[1,3],				#4
+		[1,4],				#5
+		[2,3],				#6
+		[2,4],				#7
+		[3,4]]),			#8
+	array([				#surface table
+		[0,2,4],			#0
+		[0,3,5],			#1
+		[1,2,6],			#2
+		[1,3,7],			#3
+		[4,5,8],			#4
+		[6,7,8]])			#5
+)
+
+def centerCoord(coord, resolution):
+	coord = (coord*10) + array([resolution[0]/2,resolution[1]/2])
+	return coord.astype(int)
