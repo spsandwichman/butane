@@ -8,6 +8,7 @@ class Object:
 		self.scl = scale
 
 		self.vertexTable = vertexTable
+		self.realVertexTable = vertexTable
 		self.edgeTable = edgeTable
 		self.surfaceTable = surfaceTable
 
@@ -26,8 +27,10 @@ class Object:
 			vertex = scaleVertex(vertex, self.pos, self.scl)
 		self.scl = array([0, 0, 0])
 	
-	
-
+	def realizeVertexTable(self): 			# updates and returns the object's vertex table in world space
+		for v in range(len(self.vertexTable)):
+			self.realVertexTable[v] = scaleVertex(translateVertex(rotateVertex(self.vertexTable[v], self.pos, self.rot), self.pos), self.pos, self.scl) #i'm so fucking sorry
+		return self.realVertexTable
 
 class Empty:
 	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0])):
@@ -36,13 +39,16 @@ class Empty:
 		self.scl = scale
 
 class Camera:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0]), focalLength = 1, shiftX = 0, shiftY = 0):
+	def __init__(self, resolution, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0]), focalLength = 10, shiftX = 0, shiftY = 0):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
 		self.fL = focalLength
 		self.sX = shiftX
 		self.sY = shiftY
+		self.res = resolution
+		self.screenWidth = resolution[0]
+		self.screenHeight = resolution[1]
 
 def translateVertex(vertex, trn):
 	return vertex+trn
@@ -78,10 +84,13 @@ def project(vertex, camera):
 	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
 	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
 
-	return array([projectedX, projectedY])
+	projectedX = (projectedX*10) + (camera.screenWidth/2)
+	projectedY = (projectedY*10) + (camera.screenHeight/2)
+
+	return array([projectedX, projectedY], int32)
 
 def projectAll(vertexTable, camera):
-		projectedVertexTable = zeros((len(vertexTable), 2))
+		projectedVertexTable = zeros((len(vertexTable), 2), int32)
 		for i in range(len(vertexTable)):
 			projectedVertexTable[i] = project(vertexTable[i], camera)
 		return projectedVertexTable
