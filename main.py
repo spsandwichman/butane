@@ -15,21 +15,8 @@ def main():
 	pgscreen = pg.display.set_mode(resolution)
 	
 
-	camera = Camera(resolution)
+	camera = Camera()
 	
-	projectedCube = projectAll(Cube.vertexTable, camera)
-	print(projectedCube)
-	for point in projectedCube:
-		print(int(point[0]))
-		print(int(point[1]))
-		screen[point[0]][point[1]] = array([255,255,255])
-
-
-
-
-
-
-
 
 
 
