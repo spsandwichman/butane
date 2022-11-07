@@ -9,44 +9,26 @@ blue = array([0,0,255])
 
 
 class Object:
-	def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable):
+	def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable): 
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
 
-		self.vertexTable = vertexTable
-		self.realVertexTable = vertexTable
+		self.objectVertexTable = vertexTable
+		self.WorldVertexTable = vertexTable
 		self.edgeTable = edgeTable
 		self.surfaceTable = surfaceTable
 
-	def applyPosition(self):
-		for vertex in self.vertexTable:
-			vertex = translateVertex(vertex, self.pos)
-		self.pos = array([0, 0, 0])
 	
-	def applyRotation(self):
-		for vertex in self.vertexTable:
-			vertex = rotateVertex(vertex, self.pos, self.rot)
-		self.rot = array([0, 0, 0])
-	
-	def applyScale(self):
-		for vertex in self.vertexTable:
-			vertex = scaleVertex(vertex, self.pos, self.scl)
-		self.scl = array([0, 0, 0])
-	
-	def realizeVertexTable(self): 			# updates and returns the object's vertex table in world space
-		for v in range(len(self.vertexTable)):
-			self.realVertexTable[v] = scaleVertex(translateVertex(rotateVertex(self.vertexTable[v], self.pos, self.rot), self.pos), self.pos, self.scl) #i'm so fucking sorry
-		return self.realVertexTable
 
 class Empty:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0])):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1])):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
 
 class Camera:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0]), focalLength = 10, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 10, shiftX = 0, shiftY = 0):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
