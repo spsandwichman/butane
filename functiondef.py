@@ -1,6 +1,13 @@
 import pygame as pg
 from numpy import *
 
+white = array([255,255,255])
+black = array([0,0,0])
+red = array([255,0,0])
+green = array([0,255,0])
+blue = array([0,0,255])
+
+
 class Object:
 	def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable):
 		self.pos = position
@@ -39,16 +46,23 @@ class Empty:
 		self.scl = scale
 
 class Camera:
-	def __init__(self, resolution, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0]), focalLength = 10, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([0,0,0]), focalLength = 10, shiftX = 0, shiftY = 0):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
 		self.fL = focalLength
 		self.sX = shiftX
 		self.sY = shiftY
-		self.res = resolution
-		self.screenWidth = resolution[0]
-		self.screenHeight = resolution[1]
+
+class Screen:
+	def __init__(self, height, width):
+		self.pixels = full((width,height,3), 0, dtype=uint8)
+		self.res = (height, width)
+		self.resolution = (height, width)
+		self.h = height
+		self.height = height
+		self.w = width
+		self.width = width
 
 def translateVertex(vertex, trn):
 	return vertex+trn
@@ -75,17 +89,17 @@ def rotateVertex(vertex, origin, rot):
 	return (matmul((vertex - origin).T, RotMatrix).T) + origin # magic
 
 def scaleVertex(vertex, origin, scl): 
-	return ((vertex-origin)*scl)+origin
+	return ((vertex - origin) * scl) + origin
 
-def project(vertex, camera):
+def project(vertex, camera, screen):
 
 	rotatedVertex = rotateVertex(vertex, camera.pos, camera.rot)	#transform into camera space
 
 	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
 	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
 
-	projectedX = (projectedX*10) + (camera.screenWidth/2)
-	projectedY = (projectedY*10) + (camera.screenHeight/2)
+	projectedX = (projectedX*10) + (screen.width/2)
+	projectedY = (projectedY*10) + (screen.height/2)
 
 	return array([projectedX, projectedY], int32)
 
@@ -94,6 +108,32 @@ def projectAll(vertexTable, camera):
 		for i in range(len(vertexTable)):
 			projectedVertexTable[i] = project(vertexTable[i], camera)
 		return projectedVertexTable
+
+
+def drawLine(point0, point1, screen): #bresenham magic
+	x0, y0 = point0[0], point0[1]
+	x1, y1 = point1[0], point1[1]
+	dx = abs( x1 - x0)
+	sx = 1 if x0 < x1 else -1
+	dy = -abs(y1 - y0)
+	sy = 1 if y0 < x1 else -1
+	error = dx + dy
+	while True:
+		screen.pixels[x0][y0] = white
+		if (x0 == x1) and (y0 == y1):
+			break
+		e2 = 2 * error
+		if e2 >= dy:
+			if x0 == x1:
+				break
+			error = error + dy
+			x0 = x0 + sx
+		if e2 <= dx:
+			if y0 == y1:
+				break
+			error = error + dx
+			y0 = y0 + sy
+
 
 Cube = Object(
 	array([0,0,0]),		#position
@@ -170,7 +210,3 @@ Pyramid = Object(
 		[4,5,8],			#4
 		[6,7,8]])			#5
 )
-
-def centerCoord(coord, resolution):
-	coord = (coord*10) + array([resolution[0]/2,resolution[1]/2])
-	return coord.astype(int)

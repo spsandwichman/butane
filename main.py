@@ -4,25 +4,19 @@ from numpy import *
 
 def main():
 
-	resolution = (1000,500)
-	width, height = resolution
-	screen = full((width,height,3), 0, dtype=uint8)
+	screen = Screen(1000,500)
 
 
 	pg.init()
 	pg.display.set_icon(pg.image.load("widechora.png"))
 	pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
-	pgscreen = pg.display.set_mode(resolution)
+	pgscreen = pg.display.set_mode(screen.res)
 	
 
-	camera = Camera(resolution)
+	camera = Camera(screen.res)
 	
-	projectedCube = projectAll(Cube.vertexTable, camera)
-	for point in projectedCube:
-		screen[point[0]][point[1]] = array([255,255,255])
-
-
-
+	drawLine((10,10),(700,365), screen)
+	drawLine((10,10),(999,365), screen)
 
 
 
@@ -31,7 +25,7 @@ def main():
 	running = True
 	# display loop
 	while running:
-		pg.surfarray.blit_array(pgscreen, screen)
+		pg.surfarray.blit_array(pgscreen, screen.pixels)
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
 				running = False
