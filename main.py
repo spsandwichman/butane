@@ -8,8 +8,8 @@ def main():
 
 
 	pg.init()
-	pg.display.set_icon(pg.image.load("widechora.png"))
-	pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
+	pg.display.set_icon(pg.image.load("butane-icon.png"))
+	pg.display.set_caption("Butane 0.1")
 	pgscreen = pg.display.set_mode(screen.res)
 	
 	cam = Camera()
