@@ -1,8 +1,2 @@
 TODO:
-    - just fucking restructure everything
-    
-    
-    - figure out object-space vs world-space interoperability
-        - are object-space vertex tables useful? maybe by default the vertex table should be defined in world-space
-            - could keep an object-space table around for reference if a function really needed one
-        - honestly at this point just restructure the Object class, i was being stupid when i made it
+    - idk

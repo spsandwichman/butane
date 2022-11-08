@@ -9,23 +9,75 @@ blue = array([0,0,255])
 
 
 class Object:
-	def __init__(self, position, rotation, scale, vertexTable, edgeTable, surfaceTable): 
+	def __init__(self, position, rotation, scale, objSpaceVertexTable, edgeTable, surfaceTable): 
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
 
-		self.objectVertexTable = vertexTable
-		self.WorldVertexTable = vertexTable
+		self.objSpaceVertexTable = objSpaceVertexTable
+		self.wldSpaceVertexTable = objSpaceVertexTable
 		self.edgeTable = edgeTable
 		self.surfaceTable = surfaceTable
+		self.updateWldSpaceVertexTable()
 
+	def updateWldSpaceVertexTable(self):
+		for vertex in range(len(self.objSpaceVertexTable)):
+			self.wldSpaceVertexTable[vertex] = translateVertex(rotateVertex(scaleVertex(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
+			
+	def translate(self, posDifference):
+		self.pos = self.pos + posDifference # update position variable
+		self.updateWldSpaceVertexTable()
 	
+	def rotate(self, rotDifference):
+		self.rot = self.rot + rotDifference
+		self.updateWldSpaceVertexTable()
+
+	def scale(self, sclDifference):
+		self.scl = self.scl * sclDifference
+		self.updateWldSpaceVertexTable()
+	
+	def setPos(self, newPos):
+		self.pos = newPos
+		self.updateWldSpaceVertexTable()
+
+	def setRot(self, newRot):
+		self.rot = newRot
+		self.updateWldSpaceVertexTable()
+	
+	def setScl(self, newScl):
+		self.scl = newScl
+		self.updateWldSpaceVertexTable()
+	
+	def setGeometry(self, newObjVertexTable, newEdgeTable, newSurfaceTable):
+		self.objSpaceVertexTable = newObjVertexTable
+		self.wldSpaceVertexTable = newObjVertexTable
+		self.updateWldSpaceVertexTable()
+		self.edgeTable = newEdgeTable
+		self.surfaceTable = newSurfaceTable
 
 class Empty:
 	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1])):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
+	
+	def translate(self, posDifference):
+		self.pos = self.pos + posDifference # update position variable
+	
+	def rotate(self, rotDifference):
+		self.rot = self.rot + rotDifference
+
+	def scale(self, sclDifference):
+		self.scl = self.scl * sclDifference
+	
+	def setPos(self, newPos):
+		self.pos = newPos
+
+	def setRot(self, newRot):
+		self.rot = newRot
+	
+	def setScl(self, newScl):
+		self.scl = newScl
 
 class Camera:
 	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 10, shiftX = 0, shiftY = 0):
@@ -35,21 +87,83 @@ class Camera:
 		self.fL = focalLength
 		self.sX = shiftX
 		self.sY = shiftY
+	
+	def translate(self, posDifference):
+		self.pos = self.pos + posDifference # update position variable
+	
+	def rotate(self, rotDifference):
+		self.rot = self.rot + rotDifference
+
+	def scale(self, sclDifference):
+		self.scl = self.scl * sclDifference
+
+	def changeFL(self, fLDifference):
+		self.fL = self.fL + fLDifference
+	
+	def shiftViewPlane(self, diffX, diffY):
+		self.sX = self.sX + diffX
+		self.sY = self.sY + diffY
+	
+	def setPos(self, newPos):
+		self.pos = newPos
+
+	def setRot(self, newRot):
+		self.rot = newRot
+	
+	def setScl(self, newScl):
+		self.scl = newScl
+	
+	def setFL(self, newFL):
+		self.fL = newFL
+
 
 class Screen:
-	def __init__(self, height, width):
-		self.pixels = full((width,height,3), 0, dtype=uint8)
-		self.res = (height, width)
-		self.resolution = (height, width)
+	def __init__(self, width, height):
+		self.pixels = full((width, height, 3), 0, dtype=uint8)
+		self.res = (width, height)
 		self.h = height
-		self.height = height
 		self.w = width
-		self.width = width
+	
+	def changeResolution(self, newHeight, newWidth):
+		self.h = newHeight
+		self.w = newWidth
+		self.res = (newHeight, newWidth)
+	
+	def drawPixel(self, point, color):
+		pX, pY = point
+		self.pixels[pX][pY] = color
+	
+	def drawLine(self, point0, point1, color): #bresenham magic
+		x0, y0 = point0[0], point0[1]
+		x1, y1 = point1[0], point1[1]
+		dx = abs( x1 - x0)
+		sx = 1 if x0 < x1 else -1
+		dy = -abs(y1 - y0)
+		sy = 1 if y0 < x1 else -1
+		error = dx + dy
+		while True:
+			print(str(x0) + ', ' + str(y0))
+			self.drawPixel((x0, y0), color)
+			if (x0 == x1) and (y0 == y1):
+				break
+			e2 = 2 * error
+			if e2 >= dy:
+				if x0 == x1:
+					break
+				error = error + dy
+				x0 = x0 + sx
+			if e2 <= dx:
+				if y0 == y1:
+					break
+				error = error + dx
+				y0 = y0 + sy
+	
+	
 
 def translateVertex(vertex, trn):
 	return vertex+trn
 
-def rotateVertex(vertex, origin, rot):
+def rotateVertex(vertex, rot, origin = array([0,0,0])):
 
 	xRotMatrix = array([
 		[1,            0,           0], # x-axis rotation matrix
@@ -70,12 +184,12 @@ def rotateVertex(vertex, origin, rot):
 
 	return (matmul((vertex - origin).T, RotMatrix).T) + origin # magic
 
-def scaleVertex(vertex, origin, scl): 
+def scaleVertex(vertex, scl, origin = array([0,0,0])): 
 	return ((vertex - origin) * scl) + origin
 
 def project(vertex, camera, screen):
 
-	rotatedVertex = rotateVertex(vertex, camera.pos, camera.rot)	#transform into camera space
+	rotatedVertex = rotateVertex(vertex, camera.rot, camera.pos)	#transform into camera space
 
 	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
 	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
@@ -84,38 +198,6 @@ def project(vertex, camera, screen):
 	projectedY = (projectedY*10) + (screen.height/2)
 
 	return array([projectedX, projectedY], int32)
-
-def projectAll(vertexTable, camera):
-		projectedVertexTable = zeros((len(vertexTable), 2), int32)
-		for i in range(len(vertexTable)):
-			projectedVertexTable[i] = project(vertexTable[i], camera)
-		return projectedVertexTable
-
-
-def drawLine(point0, point1, screen): #bresenham magic
-	x0, y0 = point0[0], point0[1]
-	x1, y1 = point1[0], point1[1]
-	dx = abs( x1 - x0)
-	sx = 1 if x0 < x1 else -1
-	dy = -abs(y1 - y0)
-	sy = 1 if y0 < x1 else -1
-	error = dx + dy
-	while True:
-		screen.pixels[x0][y0] = white
-		if (x0 == x1) and (y0 == y1):
-			break
-		e2 = 2 * error
-		if e2 >= dy:
-			if x0 == x1:
-				break
-			error = error + dy
-			x0 = x0 + sx
-		if e2 <= dx:
-			if y0 == y1:
-				break
-			error = error + dx
-			y0 = y0 + sy
-
 
 Cube = Object(
 	array([0,0,0]),		#position
