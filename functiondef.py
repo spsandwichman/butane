@@ -142,7 +142,6 @@ class Screen:
 		sy = 1 if y0 < x1 else -1
 		error = dx + dy
 		while True:
-			print(str(x0) + ', ' + str(y0))
 			self.drawPixel((x0, y0), color)
 			if (x0 == x1) and (y0 == y1):
 				break
