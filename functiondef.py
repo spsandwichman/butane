@@ -80,7 +80,7 @@ class Empty:
 		self.scl = newScl
 
 class Camera:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 10, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 5, shiftX = 0, shiftY = 0):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
@@ -121,22 +121,23 @@ class Screen:
 	def __init__(self, width, height):
 		self.pixels = full((width, height, 3), 0, dtype=uint8)
 		self.res = (width, height)
-		self.h = height
-		self.w = width
+		self.height = height
+		self.width = width
 	
 	def changeResolution(self, newHeight, newWidth):
-		self.h = newHeight
-		self.w = newWidth
+		self.height = newHeight
+		self.width = newWidth
 		self.res = (newHeight, newWidth)
 	
 	def drawPixel(self, point, color):
 		pX, pY = point
+		# print(str(pX) + ' ' + str(pY))
 		self.pixels[pX][pY] = color
 	
 	def drawLine(self, point0, point1, color): #bresenham magic
 		x0, y0 = point0[0], point0[1]
 		x1, y1 = point1[0], point1[1]
-		dx = abs( x1 - x0)
+		dx = abs(x1 - x0)
 		sx = 1 if x0 < x1 else -1
 		dy = -abs(y1 - y0)
 		sy = 1 if y0 < x1 else -1
@@ -156,8 +157,7 @@ class Screen:
 					break
 				error = error + dx
 				y0 = y0 + sy
-	
-	
+
 
 def translateVertex(vertex, trn):
 	return vertex+trn
@@ -197,6 +197,13 @@ def project(vertex, camera, screen):
 	projectedY = (projectedY*10) + (screen.height/2)
 
 	return array([projectedX, projectedY], int32)
+
+def r(degrees):
+	return deg2rad(degrees)
+
+def d(radians):
+	return rad2deg(radians)
+
 
 Cube = Object(
 	array([0,0,0]),		#position

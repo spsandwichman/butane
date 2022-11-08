@@ -12,8 +12,14 @@ def main():
 	pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
 	pgscreen = pg.display.set_mode(screen.res)
 	
-	
-	screen.drawLine((10,10),(700,365), red)
+	cam = Camera()
+	cam.setPos(array([0, 0, 0]))
+	cam.setRot(array([0, 0, 0]))
+
+	for vertex in Cube.wldSpaceVertexTable:
+		projectedVertex = project(vertex, cam, screen)
+		screen.drawPixel(projectedVertex, white)
+		print(projectedVertex)
 
 
 
