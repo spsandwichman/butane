@@ -12,13 +12,8 @@ def main():
 	pg.display.set_caption("RTX 500000 RAYTRACED 16K GAMING")
 	pgscreen = pg.display.set_mode(screen.res)
 	
-
-	camera = Camera(screen.res)
 	
-	drawLine((10,10),(700,365), screen)
-	drawLine((10,10),(999,365), screen)
-
-
+	screen.drawLine((10,10),(700,365), red)
 
 
 
