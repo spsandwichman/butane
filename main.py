@@ -8,7 +8,7 @@ def main():
 
 
 	pg.init()
-	pg.display.set_icon(pg.image.load("butane-icon.png"))
+	pg.display.set_icon(pg.image.load("icon32.png"))
 	pg.display.set_caption("Butane 0.1")
 	pgscreen = pg.display.set_mode(screen.res)
 	
