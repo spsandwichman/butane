@@ -1,11 +1,10 @@
-import pygame as pg
 from numpy import *
 
-white = array([255,255,255])
-black = array([0,0,0])
-red = array([255,0,0])
-green = array([0,255,0])
-blue = array([0,0,255])
+white = array([255, 255, 255])
+black = array([0, 0, 0])
+red = array([255, 0, 0])
+green = array([0, 255, 0])
+blue = array([0, 0, 255])
 
 
 class Object:
@@ -36,15 +35,15 @@ class Object:
 		self.scl = self.scl * sclDifference
 		self.updateWldSpaceVertexTable()
 	
-	def setPos(self, newPos):
+	def setPosition(self, newPos):
 		self.pos = newPos
 		self.updateWldSpaceVertexTable()
 
-	def setRot(self, newRot):
+	def setRotation(self, newRot):
 		self.rot = newRot
 		self.updateWldSpaceVertexTable()
 	
-	def setScl(self, newScl):
+	def setScale(self, newScl):
 		self.scl = newScl
 		self.updateWldSpaceVertexTable()
 	
@@ -70,13 +69,13 @@ class Empty:
 	def scale(self, sclDifference):
 		self.scl = self.scl * sclDifference
 	
-	def setPos(self, newPos):
+	def setPosition(self, newPos):
 		self.pos = newPos
 
-	def setRot(self, newRot):
+	def setRotation(self, newRot):
 		self.rot = newRot
 	
-	def setScl(self, newScl):
+	def setScale(self, newScl):
 		self.scl = newScl
 
 class Camera:
@@ -104,13 +103,13 @@ class Camera:
 		self.sX = self.sX + diffX
 		self.sY = self.sY + diffY
 	
-	def setPos(self, newPos):
+	def setPosition(self, newPos):
 		self.pos = newPos
 
-	def setRot(self, newRot):
+	def setRotation(self, newRot):
 		self.rot = newRot
 	
-	def setScl(self, newScl):
+	def setScale(self, newScl):
 		self.scl = newScl
 	
 	def setFL(self, newFL):
@@ -124,7 +123,7 @@ class Screen:
 		self.height = height
 		self.width = width
 	
-	def changeResolution(self, newHeight, newWidth):
+	def setResolution(self, newHeight, newWidth):
 		self.height = newHeight
 		self.width = newWidth
 		self.res = (newHeight, newWidth)
@@ -200,11 +199,11 @@ def project(vertex, camera, screen):
 
 	return array([projectedX, projectedY], int32)
 
-def r(degrees):
-	return deg2rad(degrees)
+def r(oldDegrees):
+	return deg2rad(oldDegrees)
 
-def d(radians):
-	return rad2deg(radians)
+def d(oldRadians):
+	return rad2deg(oldRadians)
 
 
 Cube = Object(

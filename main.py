@@ -13,8 +13,8 @@ def main():
 	pgscreen = pg.display.set_mode(screen.res)
 	
 	cam = Camera()
-	cam.setPos(array([0, 0, 0]))
-	cam.setRot(array([0, 0, 0]))
+	cam.setPosition(array([0, 0, 0]))
+	cam.setRotation(array([0, 0, 0]))
 
 	for vertex in Cube.wldSpaceVertexTable:
 		projectedVertex = project(vertex, cam, screen)
@@ -32,5 +32,5 @@ def main():
 				running = False
 		pg.display.update()
 
-if __name__=="__main__":
+if __name__ == "__main__":
 	main()
