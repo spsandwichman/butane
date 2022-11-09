@@ -1,7 +1,7 @@
 ![Butane Logo](butane.png)
 # Butane
 
-Absolutely horrendously coded 3d renderer. Currently incomplete and far from functional.
+Absolutely horrendously coded 3d renderer. Currently incomplete and far from functional. Butane started as a project to get me back into programming, but I'd like it to actually work someday.
 
 ## Contributing
 
