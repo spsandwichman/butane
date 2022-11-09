@@ -4,7 +4,7 @@ from numpy import *
 
 def main():
 
-	screen = Screen(1000,500)
+	screen = Screen(1600,900)
 
 
 	pg.init()
@@ -19,7 +19,7 @@ def main():
 	for vertex in Cube.wldSpaceVertexTable:
 		projectedVertex = project(vertex, cam, screen)
 		screen.drawPixel(projectedVertex, white)
-		print(projectedVertex)
+	print(cam.pos)
 
 
 

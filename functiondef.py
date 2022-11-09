@@ -190,6 +190,8 @@ def project(vertex, camera, screen):
 
 	rotatedVertex = rotateVertex(vertex, camera.rot, camera.pos)	#transform into camera space
 
+	rotatedVertex[2] = 0.000001 if rotatedVertex[2] == 0 else rotatedVertex[2] # prevents division by zero
+
 	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
 	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
 
