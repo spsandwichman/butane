@@ -1,4 +1,4 @@
-![Butane Logo](https://github.com/technichron/butane/blob/main/butane.png)
+![Butane Logo](butane.png)
 # Butane
 
 Absolutely horrendously coded 3d renderer. Currently incomplete and far from functional.
