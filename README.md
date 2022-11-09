@@ -1,7 +1,7 @@
 ![Butane Logo](https://github.com/technichron/butane/blob/main/butane.png)
 # Butane
 
-Absolutely horrendous 3d renderer. Currently incomplete and far from functional.
+Absolutely horrendously coded 3d renderer. Currently incomplete and far from functional.
 
 ## Contributing
 
