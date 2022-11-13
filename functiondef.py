@@ -79,7 +79,7 @@ class Empty:
 		self.scl = newScl
 
 class Camera:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 5, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 50, shiftX = 0, shiftY = 0):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
@@ -123,15 +123,17 @@ class Screen:
 		self.height = height
 		self.width = width
 	
-	def setResolution(self, newHeight, newWidth):
+	def setResolution(self, newWidth, newHeight):
 		self.height = newHeight
 		self.width = newWidth
-		self.res = (newHeight, newWidth)
+		self.res = (newWidth, newHeight)
 	
 	def drawPixel(self, point, color):
-		pX, pY = point
+		pixelX, pixelY = point
 		# print(str(pX) + ' ' + str(pY))
-		self.pixels[pX][pY] = color
+		if pixelX > self.width or pixelY > self.height: #if i try to draw off the screen array, just /dont/
+				return
+		self.pixels[pixelX][pixelY] = color
 	
 	def drawLine(self, point0, point1, color): #bresenham magic
 		x0, y0 = point0[0], point0[1]
@@ -194,8 +196,8 @@ def project(vertex, camera, screen):
 	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
 	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
 
-	projectedX = (projectedX*10) + (screen.width/2)
-	projectedY = (projectedY*10) + (screen.height/2)
+	projectedX = (projectedX*7) + (screen.width/2)
+	projectedY = (projectedY*7) + (screen.height/2)
 
 	return array([projectedX, projectedY], int32)
 

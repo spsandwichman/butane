@@ -4,7 +4,7 @@ from numpy import *
 
 def main():
 
-	screen = Screen(1600,900)
+	screen = Screen(1000,500)
 
 
 	pg.init()
@@ -13,13 +13,13 @@ def main():
 	pgscreen = pg.display.set_mode(screen.res)
 	
 	cam = Camera()
-	cam.setPosition(array([0, 0, 0]))
+	cam.setPosition(array([0, 0, -3.6]))
 	cam.setRotation(array([0, 0, 0]))
 
 	for vertex in Cube.wldSpaceVertexTable:
 		projectedVertex = project(vertex, cam, screen)
 		screen.drawPixel(projectedVertex, white)
-	print(cam.pos)
+		print(projectedVertex)
 
 
 
