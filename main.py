@@ -11,16 +11,15 @@ def main():
 	pg.display.set_icon(pg.image.load("icon32.png"))
 	pg.display.set_caption("Butane 0.1")
 	pgscreen = pg.display.set_mode(screen.res)
-	
+
 	cam = Camera()
-	cam.setPosition(array([-2.1, 0, 3.7]))
+	cam.setPosition(array([0, 0, -5]))
 	cam.setRotation(array([0, 0, 0]))
 
 	for vertex in Cube.wldSpaceVertexTable:
 		projectedVertex = project(vertex, cam, screen)
 		screen.drawPixel(projectedVertex, white)
 		print(projectedVertex)
-
 
 
 	running = True

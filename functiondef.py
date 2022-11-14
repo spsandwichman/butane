@@ -131,7 +131,7 @@ class Screen:
 	def drawPixel(self, point, color):
 		pixelX, pixelY = point
 		# print(str(pX) + ' ' + str(pY))
-		if pixelX > self.width or pixelY > self.height: #if i try to draw off the screen array, just /dont/
+		if (pixelX >= self.width or pixelY >= self.height) or (pixelX < 0 or pixelY < 0): #if i try to draw off the screen array, just /dont/
 				return
 		self.pixels[pixelX][pixelY] = color
 	
@@ -144,7 +144,10 @@ class Screen:
 		sy = 1 if y0 < x1 else -1
 		error = dx + dy
 		while True:
+			if (x0 >= self.width or y0 >= self.height) or (x0 < 0 or y0 < 0): #if i try to draw off the screen array, just /dont/
+				return
 			self.drawPixel((x0, y0), color)
+			print(str(x0) + ' ' + str(y0))
 			if (x0 == x1) and (y0 == y1):
 				break
 			e2 = 2 * error
