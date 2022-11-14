@@ -13,7 +13,7 @@ def main():
 	pgscreen = pg.display.set_mode(screen.res)
 	
 	cam = Camera()
-	cam.setPosition(array([0, 0, -3.6]))
+	cam.setPosition(array([-2.1, 0, 3.7]))
 	cam.setRotation(array([0, 0, 0]))
 
 	for vertex in Cube.wldSpaceVertexTable:

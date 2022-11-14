@@ -189,7 +189,7 @@ def scaleVertex(vertex, scl, origin = array([0,0,0])):
 
 def project(vertex, camera, screen):
 
-	rotatedVertex = rotateVertex(vertex, camera.rot, camera.pos)	#transform into camera space
+	rotatedVertex = rotateVertex(vertex-camera.pos, camera.rot, camera.pos)	#transform into camera space
 
 	rotatedVertex[2] = 0.000001 if rotatedVertex[2] == 0 else rotatedVertex[2] # prevents division by zero
 
