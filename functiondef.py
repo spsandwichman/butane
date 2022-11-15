@@ -15,6 +15,7 @@ class Object:
 
 		self.objSpaceVertexTable = objSpaceVertexTable
 		self.wldSpaceVertexTable = objSpaceVertexTable
+		self.projectedVertexTable = self.pixels = full((len(objSpaceVertexTable), 2), 0)
 		self.edgeTable = edgeTable
 		self.surfaceTable = surfaceTable
 		self.updateWldSpaceVertexTable()
@@ -22,6 +23,10 @@ class Object:
 	def updateWldSpaceVertexTable(self):
 		for vertex in range(len(self.objSpaceVertexTable)):
 			self.wldSpaceVertexTable[vertex] = translateVertex(rotateVertex(scaleVertex(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
+	
+	def projectAll(self, camera, screen):
+		for vertex in range(len(self.wldSpaceVertexTable)):
+			self.projectedVertexTable[vertex] = project(self.wldSpaceVertexTable[vertex], camera, screen)
 			
 	def translate(self, posDifference):
 		self.pos = self.pos + posDifference # update position variable
