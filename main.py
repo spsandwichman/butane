@@ -19,13 +19,16 @@ def main():
 
 	Cube.projectAll(cam, screen)
 
-	print(Cube.projectedVertexTable)
 	for vertex in Cube.projectedVertexTable:
 		screen.drawPixel(vertex, white)
 	
-	for edge in Cube.edgeTable:
-		screen.drawLine(Cube.projectedVertexTable[edge[0]], Cube.projectedVertexTable[edge[1]], white)
+	x=13
+	screen.drawLine(Cube.projectedVertexTable[Cube.edgeTable[x][0]], Cube.projectedVertexTable[Cube.edgeTable[x][1]], white)
+	print(Cube.projectedVertexTable[4])
+	print(Cube.projectedVertexTable[5])
 
+	#for edge in Cube.edgeTable:
+	#	screen.drawLine(Cube.projectedVertexTable[edge[0]], Cube.projectedVertexTable[edge[1]], white)
 
 	running = True
 	# display loop
@@ -34,6 +37,9 @@ def main():
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
 				running = False
+			if event.type == pg.KEYDOWN:
+				if event.key == pg.K_ESCAPE:
+					running = False
 		pg.display.update()
 
 if __name__ == "__main__":

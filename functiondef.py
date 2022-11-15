@@ -143,6 +143,9 @@ class Screen:
 	def drawLine(self, point0, point1, color): #bresenham magic
 		x0, y0 = point0[0], point0[1]
 		x1, y1 = point1[0], point1[1]
+		if y0 > y1:
+			y0, y1 = y1, y0
+			x0, x1 = x1, x0
 		dx = abs(x1 - x0)
 		sx = 1 if x0 < x1 else -1
 		dy = -abs(y1 - y0)
@@ -152,7 +155,7 @@ class Screen:
 			if (x0 >= self.width or y0 >= self.height) or (x0 < 0 or y0 < 0): #if i try to draw off the screen array, just /dont/
 				return
 			self.drawPixel((x0, y0), color)
-			print(str(x0) + ' ' + str(y0))
+			#  print(str(x0) + ' ' + str(y0))
 			if (x0 == x1) and (y0 == y1):
 				break
 			e2 = 2 * error
