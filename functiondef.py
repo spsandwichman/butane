@@ -143,19 +143,16 @@ class Screen:
 	def drawLine(self, point0, point1, color): #bresenham magic
 		x0, y0 = point0[0], point0[1]
 		x1, y1 = point1[0], point1[1]
-		if y0 > y1:
-			y0, y1 = y1, y0
-			x0, x1 = x1, x0
 		dx = abs(x1 - x0)
 		sx = 1 if x0 < x1 else -1
 		dy = -abs(y1 - y0)
-		sy = 1 if y0 < x1 else -1
+		sy = 1 if y0 < y1 else -1
 		error = dx + dy
+	
 		while True:
 			if (x0 >= self.width or y0 >= self.height) or (x0 < 0 or y0 < 0): #if i try to draw off the screen array, just /dont/
 				return
 			self.drawPixel((x0, y0), color)
-			#  print(str(x0) + ' ' + str(y0))
 			if (x0 == x1) and (y0 == y1):
 				break
 			e2 = 2 * error
@@ -177,19 +174,19 @@ def translateVertex(vertex, trn):
 def rotateVertex(vertex, rot, origin = array([0,0,0])):
 
 	xRotMatrix = array([
-		[1,            0,           0], # x-axis rotation matrix
-		[0,  cos(rot[0]), sin(rot[0])],
+		[1, 0, 0], # x-axis rotation matrix
+		[0, cos(rot[0]), sin(rot[0])],
 		[0, -sin(rot[0]), cos(rot[0])],
 	])
 	yRotMatrix = array([
 		[cos(rot[1]), 0, -sin(rot[1])], # y-axis rotation matrix
-		[          0, 1,            0],
-		[sin(rot[1]), 0,  cos(rot[1])],
+		[0, 1, 0],
+		[sin(rot[1]), 0, cos(rot[1])],
 	])
 	zRotMatrix = array([
-		[ cos(rot[2]), sin(rot[2]), 0], # z-axis rotation matrix
+		[cos(rot[2]), sin(rot[2]), 0], # z-axis rotation matrix
 		[-sin(rot[2]), cos(rot[2]), 0],
-		[           0,           0, 1],
+		[0, 0, 1],
 	])
 	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
 

@@ -13,22 +13,17 @@ def main():
 	pgscreen = pg.display.set_mode(screen.res)
 
 	cam = Camera()
-	cam.setPosition(array([0, 0, 3]))
+	cam.setPosition(array([0, 0, 5]))
 	cam.setRotation(array([0, 0, 0]))
-	Cube.setRotation(array([0, 0, 0]))
+	Cube.setRotation(array([0.0, 0.0, 0.0]))
 
 	Cube.projectAll(cam, screen)
 
 	for vertex in Cube.projectedVertexTable:
 		screen.drawPixel(vertex, white)
-	
-	x=13
-	screen.drawLine(Cube.projectedVertexTable[Cube.edgeTable[x][0]], Cube.projectedVertexTable[Cube.edgeTable[x][1]], white)
-	print(Cube.projectedVertexTable[4])
-	print(Cube.projectedVertexTable[5])
 
-	#for edge in Cube.edgeTable:
-	#	screen.drawLine(Cube.projectedVertexTable[edge[0]], Cube.projectedVertexTable[edge[1]], white)
+	for edge in Cube.edgeTable:
+		screen.drawLine(Cube.projectedVertexTable[edge[0]], Cube.projectedVertexTable[edge[1]], white)
 
 	running = True
 	# display loop
