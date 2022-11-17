@@ -12,22 +12,33 @@ def main():
 	pg.display.set_caption("Butane 0.1")
 	pgscreen = pg.display.set_mode(screen.res)
 
+	clock = pg.time.Clock()
+
 	cam = Camera()
 	cam.setPosition(array([0, 0, 5]))
 	cam.setRotation(array([0, 0, 0]))
-	Cube.setRotation(array([0.0, 0.0, 0.0]))
+	Pyramid.setRotation(array([r(-90), 0.0, 0.0]))
 
-	Cube.projectAll(cam, screen)
 
-	for vertex in Cube.projectedVertexTable:
-		screen.drawPixel(vertex, white)
 
-	for edge in Cube.edgeTable:
-		screen.drawLine(Cube.projectedVertexTable[edge[0]], Cube.projectedVertexTable[edge[1]], white)
+
 
 	running = True
 	# display loop
+
 	while running:
+		
+		Pyramid.projectAll(cam, screen)
+
+		for edge in Pyramid.edgeTable:
+			screen.drawLine(Pyramid.projectedVertexTable[edge[0]], Pyramid.projectedVertexTable[edge[1]], white)
+
+		for vertex in Pyramid.projectedVertexTable:
+			screen.drawPixel(vertex, red)
+		
+		Pyramid.setRotation(array([0.0, 0.01, 0.0]))
+		print(Pyramid.rot)
+		
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
@@ -35,7 +46,15 @@ def main():
 			if event.type == pg.KEYDOWN:
 				if event.key == pg.K_ESCAPE:
 					running = False
+		
+		screen.clear()
 		pg.display.update()
+
+		clock.tick()
+		print(clock.get_fps())
+		
+
+
 
 if __name__ == "__main__":
 	main()

@@ -8,20 +8,21 @@ blue = array([0, 0, 255])
 
 
 class Object:
-	def __init__(self, position, rotation, scale, objSpaceVertexTable, edgeTable, surfaceTable): 
+	def __init__(self, position, rotation, scale, objSpaceVertexTable, edgeTable, surfaceTable):
 		self.pos = position
 		self.rot = rotation
 		self.scl = scale
 
 		self.objSpaceVertexTable = objSpaceVertexTable
 		self.wldSpaceVertexTable = objSpaceVertexTable
-		self.projectedVertexTable = self.pixels = full((len(objSpaceVertexTable), 2), 0)
+		self.projectedVertexTable = full((len(objSpaceVertexTable), 2), 0)
 		self.edgeTable = edgeTable
 		self.surfaceTable = surfaceTable
 		self.updateWldSpaceVertexTable()
 
 	def updateWldSpaceVertexTable(self):
 		for vertex in range(len(self.objSpaceVertexTable)):
+			self.wldSpaceVertexTable = self.objSpaceVertexTable
 			self.wldSpaceVertexTable[vertex] = translateVertex(rotateVertex(scaleVertex(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
 	
 	def projectAll(self, camera, screen):
@@ -45,6 +46,7 @@ class Object:
 		self.updateWldSpaceVertexTable()
 
 	def setRotation(self, newRot):
+		self.rot = array([0,0,0])
 		self.rot = newRot
 		self.updateWldSpaceVertexTable()
 	
@@ -166,6 +168,9 @@ class Screen:
 					break
 				error = error + dx
 				y0 = y0 + sy
+	
+	def clear(self):
+		self.pixels = full((self.width, self.height, 3), 0, dtype=uint8)
 
 
 def translateVertex(vertex, trn):
@@ -173,8 +178,8 @@ def translateVertex(vertex, trn):
 
 def rotateVertex(vertex, rot, origin = array([0,0,0])):
 
-	xRotMatrix = array([
-		[1, 0, 0], # x-axis rotation matrix
+	xRotMatrix = array([ 				# x-axis rotation matrix
+		[1, 0, 0],
 		[0, cos(rot[0]), sin(rot[0])],
 		[0, -sin(rot[0]), cos(rot[0])],
 	])
@@ -228,7 +233,8 @@ Cube = Object(
 		[ 1,-1,-1],			#4
 		[ 1,-1, 1],			#5
 		[ 1, 1,-1],			#6
-		[ 1, 1, 1]]),		#7
+		[ 1, 1, 1]],		#7
+		dtype=float),
 	array([      	   #edge table
 		[0,1],				#0
 		[0,2],				#1
@@ -272,7 +278,8 @@ Pyramid = Object(
 		[-1, 1,-1],			#1
 		[ 1,-1,-1],			#2
 		[ 1, 1,-1],			#3
-		[ 0, 0, 1]]),		#4
+		[ 0, 0, 1]],		#4
+		dtype=float),
 	array([				#edge table
 		[0,1],				#0
 		[0,2],				#1
