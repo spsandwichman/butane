@@ -13,16 +13,15 @@ class Object:
 		self.rot = rotation
 		self.scl = scale
 
-		self.objSpaceVertexTable = objSpaceVertexTable
-		self.wldSpaceVertexTable = objSpaceVertexTable
+		self.objSpaceVertexTable = objSpaceVertexTable.copy()
+		self.wldSpaceVertexTable = full((len(objSpaceVertexTable), 3), 0, dtype=float)
 		self.projectedVertexTable = full((len(objSpaceVertexTable), 2), 0)
-		self.edgeTable = edgeTable
-		self.surfaceTable = surfaceTable
+		self.edgeTable = edgeTable.copy()
+		self.surfaceTable = surfaceTable.copy()
 		self.updateWldSpaceVertexTable()
 
 	def updateWldSpaceVertexTable(self):
 		for vertex in range(len(self.objSpaceVertexTable)):
-			self.wldSpaceVertexTable = self.objSpaceVertexTable
 			self.wldSpaceVertexTable[vertex] = translateVertex(rotateVertex(scaleVertex(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
 	
 	def projectAll(self, camera, screen):

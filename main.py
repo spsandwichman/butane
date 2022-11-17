@@ -15,9 +15,8 @@ def main():
 	clock = pg.time.Clock()
 
 	cam = Camera()
-	cam.setPosition(array([0, 0, 5]))
-	cam.setRotation(array([0, 0, 0]))
-	Pyramid.setRotation(array([r(-90), 0.0, 0.0]))
+	cam.setPosition(array([0, 1, 5]))
+	cam.setRotation(array([r(0), r(0), r(0)]))
 
 
 
@@ -28,16 +27,26 @@ def main():
 
 	while running:
 		
-		Pyramid.projectAll(cam, screen)
+		origin = project(array([0,0,0]), cam, screen)
+		unitVectorX = project(array([1,0,0]), cam, screen)
+		unitVectorY = project(array([0,1,0]), cam, screen)
+		unitVectorZ = project(array([0,0,1]), cam, screen)
 
+		screen.drawLine(unitVectorX, origin, red)
+		screen.drawLine(unitVectorY, origin, green)
+		screen.drawLine(unitVectorZ, origin, blue)
+		screen.drawPixel(origin, white)
+
+
+
+
+
+		Pyramid.projectAll(cam, screen)
 		for edge in Pyramid.edgeTable:
 			screen.drawLine(Pyramid.projectedVertexTable[edge[0]], Pyramid.projectedVertexTable[edge[1]], white)
-
 		for vertex in Pyramid.projectedVertexTable:
 			screen.drawPixel(vertex, red)
-		
-		Pyramid.setRotation(array([0.0, 0.01, 0.0]))
-		print(Pyramid.rot)
+		Pyramid.rotate(array([0.0, 0, 0.005]))
 		
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
 		for event in pg.event.get():
@@ -51,7 +60,7 @@ def main():
 		pg.display.update()
 
 		clock.tick()
-		print(clock.get_fps())
+		print("fps: " + str(int(clock.get_fps())))
 		
 
 
