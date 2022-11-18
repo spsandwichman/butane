@@ -15,8 +15,8 @@ def main():
 	clock = pg.time.Clock()
 
 	cam = Camera()
-	cam.setPosition(array([0, 5, 5]))
-	cam.setRotation(array([r(30), r(0), r(0)]))
+	cam.setPosition(array([0, 0, 5]))
+	cam.setRotation(array([r(0), r(0), r(0)]))
 
 
 
@@ -37,12 +37,13 @@ def main():
 		screen.drawLine(unitVectorZ, origin, blue)
 		screen.drawPixel(origin, white)
 
-		Pyramid.projectAll(cam, screen)
-		for edge in Pyramid.edgeTable:
-			screen.drawLine(Pyramid.projectedVertexTable[edge[0]], Pyramid.projectedVertexTable[edge[1]], white)
-		for vertex in Pyramid.projectedVertexTable:
+		Cube.projectAll(cam, screen)
+		for edge in Cube.edgeTable:
+			screen.drawLine(Cube.projectedVertexTable[edge[0]], Cube.projectedVertexTable[edge[1]], white)
+		for vertex in Cube.projectedVertexTable:
 			screen.drawPixel(vertex, red)
-		Pyramid.rotate(array([0.0, 0.0, 0.005]))
+		Cube.setScale(array([1, 1, 1]))
+		Cube.rotate(array([0.0, 0.002, 0.005]))
 		
 		
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
@@ -52,12 +53,28 @@ def main():
 			if event.type == pg.KEYDOWN:
 				if event.key == pg.K_ESCAPE:
 					running = False
+				if event.key == pg.K_w:
+					cam.translate(array([0, 0, -0.5]))
+				if event.key == pg.K_s:
+					cam.translate(array([0, 0, 0.5]))
+				if event.key == pg.K_a:
+					cam.translate(array([0.5, 0, 0]))
+				if event.key == pg.K_d:
+					cam.translate(array([-0.5, 0, 0]))
+				if event.key == pg.K_LSHIFT:
+					cam.translate(array([0, 0.5, 0]))
+				if event.key == pg.K_SPACE:
+					cam.translate(array([0, -0.5, 0]))
+				if event.key == pg.K_UP:
+					cam.rotate(array([0.01, 0, 0]))
+		
 		
 		screen.clear()
 		pg.display.update()
 
 		clock.tick()
-		print("fps: " + str(int(clock.get_fps())))
+		#print("fps: " + str(int(clock.get_fps())))
+		print(cam.pos)
 		
 
 
