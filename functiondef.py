@@ -137,9 +137,9 @@ class Screen:
 	def drawPixel(self, point, color):
 		pixelX, pixelY = point
 		# print(str(pX) + ' ' + str(pY))
-		if (pixelX >= self.width or pixelY >= self.height) or (pixelX < 0 or pixelY < 0): #if i try to draw off the screen array, just /dont/
+		if (pixelX >= self.width or (self.height-pixelY) >= self.height) or (pixelX < 0 or pixelY < 0): #if i try to draw off the screen array, just /dont/
 				return
-		self.pixels[pixelX][pixelY] = color
+		self.pixels[pixelX][self.height-pixelY] = color #fixes screen orientation bug, sets 0,0 to bottom left corner instead of top left
 	
 	def drawLine(self, point0, point1, color): #bresenham magic
 		x0, y0 = point0[0], point0[1]

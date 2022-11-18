@@ -15,8 +15,8 @@ def main():
 	clock = pg.time.Clock()
 
 	cam = Camera()
-	cam.setPosition(array([0, 1, 5]))
-	cam.setRotation(array([r(0), r(0), r(0)]))
+	cam.setPosition(array([0, 5, 5]))
+	cam.setRotation(array([r(30), r(0), r(0)]))
 
 
 
@@ -37,16 +37,13 @@ def main():
 		screen.drawLine(unitVectorZ, origin, blue)
 		screen.drawPixel(origin, white)
 
-
-
-
-
 		Pyramid.projectAll(cam, screen)
 		for edge in Pyramid.edgeTable:
 			screen.drawLine(Pyramid.projectedVertexTable[edge[0]], Pyramid.projectedVertexTable[edge[1]], white)
 		for vertex in Pyramid.projectedVertexTable:
 			screen.drawPixel(vertex, red)
-		Pyramid.rotate(array([0.0, 0, 0.005]))
+		Pyramid.rotate(array([0.0, 0.0, 0.005]))
+		
 		
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
 		for event in pg.event.get():
