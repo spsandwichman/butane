@@ -201,7 +201,24 @@ def scaleVertex(vertex, scl, origin = array([0,0,0])):
 
 def project(vertex, camera, screen):
 
-	rotatedVertex = rotateVertex(vertex-camera.pos, camera.rot, camera.pos)	#transform into camera space
+	xRotMatrix = array([ 				# x-axis rotation matrix
+		[1, 0, 0],
+		[0, cos(camera.rot[0]), sin(camera.rot[0])],
+		[0, -sin(camera.rot[0]), cos(camera.rot[0])],
+	])
+	yRotMatrix = array([
+		[cos(camera.rot[1]), 0, -sin(camera.rot[1])], # y-axis rotation matrix
+		[0, 1, 0],
+		[sin(camera.rot[1]), 0, cos(camera.rot[1])],
+	])
+	zRotMatrix = array([
+		[cos(camera.rot[2]), sin(camera.rot[2]), 0], # z-axis rotation matrix
+		[-sin(camera.rot[2]), cos(camera.rot[2]), 0],
+		[0, 0, 1],
+	])
+	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+
+	rotatedVertex = matmul(RotMatrix, vertex-camera.pos) #transform into camera space
 
 	rotatedVertex[2] = 0.000001 if rotatedVertex[2] == 0 else rotatedVertex[2] # prevents division by zero
 

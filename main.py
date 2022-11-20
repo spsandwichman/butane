@@ -43,7 +43,7 @@ def main():
 		for vertex in Cube.projectedVertexTable:
 			screen.drawPixel(vertex, red)
 		Cube.setScale(array([1, 1, 1]))
-		Cube.rotate(array([0.0, 0.002, 0.005]))
+		#Cube.rotate(array([0.0, 0.002, 0.005]))
 		
 		
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
@@ -66,7 +66,9 @@ def main():
 				if event.key == pg.K_SPACE:
 					cam.translate(array([0, -0.5, 0]))
 				if event.key == pg.K_UP:
-					cam.rotate(array([0.01, 0, 0]))
+					cam.rotate(array([r(-1), 0, 0]))
+				if event.key == pg.K_DOWN:
+					cam.rotate(array([r(1), 0, 0]))
 		
 		
 		screen.clear()
@@ -74,7 +76,7 @@ def main():
 
 		clock.tick()
 		#print("fps: " + str(int(clock.get_fps())))
-		print(cam.pos)
+		print(str(cam.pos) + str(cam.rot))
 		
 
 
