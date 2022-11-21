@@ -1,2 +1,2 @@
 TODO:
-    - fix setRotation bug
+    - tri coloring
