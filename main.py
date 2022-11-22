@@ -5,8 +5,8 @@ from numpy import *
 def main():
 
 	screen = Screen(1000,500)
-
-
+	scene = Scene()
+	
 	pg.init()
 	pg.display.set_icon(pg.image.load("icon32.png"))
 	pg.display.set_caption("Butane 0.1")
@@ -15,16 +15,19 @@ def main():
 	clock = pg.time.Clock()
 
 	cam = Camera()
-	cam.setPosition(array([0, 0, 5]))
-	cam.setRotation(array([r(0), r(0), r(0)]))
+	cam.setPosition(array([-1.5, 6, 1]))
+	cam.setRotation(array([r(-90), 0, 0]))
 
+	Pyramid.setPosition(array([-3, 0, 0]))
 
+	scene.addObjectToScene(Cube)
+	scene.addObjectToScene(Pyramid)
 
 
 
 	running = True
 	# display loop
-
+	iterator = 1.01
 	while running:
 		
 		origin = project(array([0,0,0]), cam, screen)
@@ -37,15 +40,21 @@ def main():
 		screen.drawLine(unitVectorZ, origin, blue)
 		screen.drawPixel(origin, white)
 
-		Cube.projectAll(cam, screen)
-		for edge in Cube.edgeTable:
-			screen.drawLine(Cube.projectedVertexTable[edge[0]], Cube.projectedVertexTable[edge[1]], white)
-		for vertex in Cube.projectedVertexTable:
-			screen.drawPixel(vertex, red)
-		Cube.setScale(array([1, 1, 1]))
-		#Cube.rotate(array([0.0, 0.002, 0.005]))
+
+		#SCENE RENDERING
+		for obj in scene.objectCollection:
+			obj.projectAll(cam, screen)
+			for edge in obj.edgeTable:
+				screen.drawLine(obj.projectedVertexTable[edge[0]], obj.projectedVertexTable[edge[1]], white)
+			for vertex in obj.projectedVertexTable:
+				screen.drawPixel(vertex, red)
 		
+		Cube.rotate(array([0.01,0,0]))
+		Pyramid.rotate(array([0,0,0.03]))
+	
+		#Pyramid.scale(array([1,1.004,1]))
 		
+
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
@@ -66,17 +75,22 @@ def main():
 				if event.key == pg.K_SPACE:
 					cam.translate(array([0, -0.5, 0]))
 				if event.key == pg.K_UP:
-					cam.rotate(array([r(-1), 0, 0]))
+					cam.rotate(array([r(-10), 0, 0]))
 				if event.key == pg.K_DOWN:
-					cam.rotate(array([r(1), 0, 0]))
+					cam.rotate(array([r(10), 0, 0]))
+				if event.key == pg.K_LEFT:
+					cam.rotate(array([0, 0, r(10)]))
+				if event.key == pg.K_RIGHT:
+					cam.rotate(array([0, 0, r(-10)]))
 		
 		
 		screen.clear()
 		pg.display.update()
+		
 
 		clock.tick()
 		#print("fps: " + str(int(clock.get_fps())))
-		print(str(cam.pos) + str(cam.rot))
+		print("cam pos: " + str(cam.pos) +  " cam rot: " + str(cam.rotDeg) + " fps: " + str(int(clock.get_fps())))
 		
 
 
