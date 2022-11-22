@@ -10,7 +10,8 @@ blue = array([0, 0, 255])
 class Object:
 	def __init__(self, position, rotation, scale, objSpaceVertexTable, edgeTable, surfaceTable):
 		self.pos = position
-		self.rot = rotation
+		self.rot = rotation				#always in radians
+		self.rotDeg = rotation
 		self.scl = scale
 
 		self.objSpaceVertexTable = objSpaceVertexTable.copy()
@@ -34,6 +35,8 @@ class Object:
 	
 	def rotate(self, rotDifference):
 		self.rot = self.rot + rotDifference
+		for val in range(len(self.rotDeg)):
+			self.rotDeg[val] = d(self.rot[val])
 		self.updateWldSpaceVertexTable()
 
 	def scale(self, sclDifference):
@@ -45,8 +48,9 @@ class Object:
 		self.updateWldSpaceVertexTable()
 
 	def setRotation(self, newRot):
-		self.rot = array([0,0,0])
-		self.rot = newRot
+		self.rot = newRot.copy()
+		for val in range(len(self.rotDeg)):
+			self.rotDeg[val] = d(self.rot[val])
 		self.updateWldSpaceVertexTable()
 	
 	def setScale(self, newScl):
@@ -63,7 +67,8 @@ class Object:
 class Empty:
 	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1])):
 		self.pos = position
-		self.rot = rotation
+		self.rot = rotation				#always in radians
+		self.rotDeg = rotation
 		self.scl = scale
 	
 	def translate(self, posDifference):
@@ -71,6 +76,8 @@ class Empty:
 	
 	def rotate(self, rotDifference):
 		self.rot = self.rot + rotDifference
+		for val in range(len(self.rotDeg)):
+			self.rotDeg[val] = d(self.rot[val])
 
 	def scale(self, sclDifference):
 		self.scl = self.scl * sclDifference
@@ -80,6 +87,8 @@ class Empty:
 
 	def setRotation(self, newRot):
 		self.rot = newRot
+		for val in range(len(self.rotDeg)):
+			self.rotDeg[val] = d(self.rot[val])
 	
 	def setScale(self, newScl):
 		self.scl = newScl
@@ -87,17 +96,23 @@ class Empty:
 class Camera:
 	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 50, shiftX = 0, shiftY = 0):
 		self.pos = position
-		self.rot = rotation
+		self.rot = rotation				#always in radians
+		self.rotDeg = rotation
 		self.scl = scale
 		self.fL = focalLength
 		self.sX = shiftX
 		self.sY = shiftY
+
+		for val in range(len(self.rotDeg)):
+			self.rotDeg[val] = d(self.rot[val])
 	
 	def translate(self, posDifference):
-		self.pos = self.pos + posDifference # update position variable
+		self.pos = self.pos + posDifference
 	
 	def rotate(self, rotDifference):
 		self.rot = self.rot + rotDifference
+		for val in range(len(self.rotDeg)):
+			self.rotDeg[val] = d(self.rot[val])
 
 	def scale(self, sclDifference):
 		self.scl = self.scl * sclDifference
@@ -114,6 +129,8 @@ class Camera:
 
 	def setRotation(self, newRot):
 		self.rot = newRot
+		for val in range(len(self.rotDeg)):
+			self.rotDeg[val] = d(self.rot[val])
 	
 	def setScale(self, newScl):
 		self.scl = newScl
@@ -167,9 +184,25 @@ class Screen:
 					break
 				error = error + dx
 				y0 = y0 + sy
+		
+	def fill(self, color):
+		for row in range(self.width):
+			for column in range(self.height):
+				self.drawPixel((row, column), color)
 	
 	def clear(self):
 		self.pixels = full((self.width, self.height, 3), 0, dtype=uint8)
+
+
+class Scene:
+	def __init__(self, backgroundColor = array([0,0,0])):
+		self.objectCollection = empty(0, dtype=Object)
+		self.bg = backgroundColor
+
+	def addObjectToScene(self, obj):
+		self.objectCollection = append(self.objectCollection, obj)
+
+
 
 
 def translateVertex(vertex, trn):
@@ -314,3 +347,4 @@ Pyramid = Object(
 		[4,5,8],			#4
 		[6,7,8]])			#5
 )
+
