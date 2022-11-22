@@ -23,7 +23,7 @@ class Object:
 
 	def updateWldSpaceVertexTable(self):
 		for vertex in range(len(self.objSpaceVertexTable)):
-			self.wldSpaceVertexTable[vertex] = translateVertex(rotateVertex(scaleVertex(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
+			self.wldSpaceVertexTable[vertex] = translateVector(rotateVector(scaleVector(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
 	
 	def projectAll(self, camera, screen):
 		for vertex in range(len(self.wldSpaceVertexTable)):
@@ -205,32 +205,47 @@ class Scene:
 
 
 
-def translateVertex(vertex, trn):
-	return vertex+trn
+def translateVector(vector, trn):
+	translationMatrix = array([
+		[1, 0, 0, trn[0]],
+		[0, 1, 0, trn[1]],
+		[0, 0, 1, trn[2]],
+		[0, 0, 0, 1]])
+	
+	return delete(matmul(translationMatrix,append(vector,1).T).T,3)
 
-def rotateVertex(vertex, rot, origin = array([0,0,0])):
+def rotateVector(vector, rot, origin = array([0,0,0])):
 
-	xRotMatrix = array([ 				# x-axis rotation matrix
-		[1, 0, 0],
-		[0, cos(rot[0]), sin(rot[0])],
-		[0, -sin(rot[0]), cos(rot[0])],
+	xRotMatrix = array([					# x-axis rotation matrix
+		[1, 0, 0, 0],
+		[0, cos(rot[0]), sin(rot[0]), 0],
+		[0, -sin(rot[0]), cos(rot[0]), 0],
+		[0, 0, 0, 1]
 	])
-	yRotMatrix = array([
-		[cos(rot[1]), 0, -sin(rot[1])], # y-axis rotation matrix
-		[0, 1, 0],
-		[sin(rot[1]), 0, cos(rot[1])],
+	yRotMatrix = array([					# y-axis rotation matrix
+		[cos(rot[1]), 0, -sin(rot[1]), 0],
+		[0, 1, 0, 0],
+		[sin(rot[1]), 0, cos(rot[1]), 0],
+		[0, 0, 0, 1]
 	])
-	zRotMatrix = array([
-		[cos(rot[2]), sin(rot[2]), 0], # z-axis rotation matrix
-		[-sin(rot[2]), cos(rot[2]), 0],
-		[0, 0, 1],
+	zRotMatrix = array([					# z-axis rotation matrix
+		[cos(rot[2]), sin(rot[2]), 0, 0], 
+		[-sin(rot[2]), cos(rot[2]), 0, 0],
+		[0, 0, 1, 0],
+		[0, 0, 0, 1]
 	])
-	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+	rotationMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
 
-	return (matmul((vertex - origin).T, RotMatrix).T) + origin # magic
+	return delete(matmul(rotationMatrix,append((vector-origin),1).T).T,3)+origin
 
-def scaleVertex(vertex, scl, origin = array([0,0,0])): 
-	return ((vertex - origin) * scl) + origin
+def scaleVector(vector, scl, origin = array([0,0,0])): 
+	scaleMatrix = array([
+		[scl[0], 0, 0, 0],
+		[0, scl[1], 0, 0],
+		[0, 0, scl[2], 0],
+		[0, 0, 0, 1]])
+	
+	return delete(matmul(scaleMatrix,append((vector-origin),1).T).T,3)+origin
 
 def project(vertex, camera, screen):
 
