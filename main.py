@@ -1,6 +1,5 @@
-from functiondef import *
+from classes import * # imports numpy and functions.py through reference
 import pygame as pg
-from numpy import *
 
 def main():
 
