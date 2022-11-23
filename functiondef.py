@@ -6,6 +6,11 @@ red = array([255, 0, 0])
 green = array([0, 255, 0])
 blue = array([0, 0, 255])
 
+def r(oldDegrees):
+	return deg2rad(oldDegrees)
+
+def d(oldRadians):
+	return rad2deg(oldRadians)
 
 class Object:
 	def __init__(self, position, rotation, scale, objSpaceVertexTable, edgeTable, surfaceTable):
@@ -130,14 +135,16 @@ class Empty:
 		self.scl = newScl
 
 class Camera:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), verticalFieldOfView = 0, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), fieldOfView = r(30), shiftX = 0, shiftY = 0, nearZ = 0.1, farZ = 5):
 		self.pos = position
 		self.rot = rotation				#always in radians
-		self.rotDeg = rotation
+		self.rotDeg = rotation			#rotation in degrees - do not write to except to change it to reflect self.rot
 		self.scl = scale
-		self.vFOV = verticalFieldOfView
+		self.FOV = fieldOfView
 		self.sX = shiftX
 		self.sY = shiftY
+		self.nearZ = nearZ
+		self.farZ = farZ
 
 		for val in range(len(self.rotDeg)):
 			self.rotDeg[val] = d(self.rot[val])
@@ -171,9 +178,8 @@ class Camera:
 	def setScale(self, newScl):
 		self.scl = newScl
 	
-	def setFL(self, newFL):
-		self.fL = newFL
-
+	def setFOV(self, newFOV):
+		self.FOV = newFOV
 
 class Screen:
 	def __init__(self, width, height):
@@ -181,11 +187,13 @@ class Screen:
 		self.res = (width, height)
 		self.height = height
 		self.width = width
+		self.aspectRatio = width/height
 	
 	def setResolution(self, newWidth, newHeight):
 		self.height = newHeight
 		self.width = newWidth
 		self.res = (newWidth, newHeight)
+		self.aspectRatio = newWidth/newHeight
 	
 	def drawPixel(self, point, color):
 		pixelX, pixelY = point
@@ -228,7 +236,6 @@ class Screen:
 	
 	def clear(self):
 		self.pixels = full((self.width, self.height, 3), 0, dtype=uint8)
-
 
 class Scene:
 	def __init__(self, backgroundColor = array([0,0,0])):
@@ -285,41 +292,44 @@ def scaleVector(vector, scl, origin = array([0,0,0])):
 
 def project(vertex, camera, screen):
 
-	xRotMatrix = array([ 				# x-axis rotation matrix
-		[1, 0, 0],
-		[0, cos(camera.rot[0]), sin(camera.rot[0])],
-		[0, -sin(camera.rot[0]), cos(camera.rot[0])],
+	xRotMatrix = array([					# x-axis rotation matrix
+		[1, 0, 0, 0],
+		[0, cos(camera.rot[0]), sin(camera.rot[0]), 0],
+		[0, -sin(camera.rot[0]), cos(camera.rot[0]), 0],
+		[0, 0, 0, 1]
 	])
-	yRotMatrix = array([
-		[cos(camera.rot[1]), 0, -sin(camera.rot[1])], # y-axis rotation matrix
-		[0, 1, 0],
-		[sin(camera.rot[1]), 0, cos(camera.rot[1])],
+	yRotMatrix = array([					# y-axis rotation matrix
+		[cos(camera.rot[1]), 0, -sin(camera.rot[1]), 0],
+		[0, 1, 0, 0],
+		[sin(camera.rot[1]), 0, cos(camera.rot[1]), 0],
+		[0, 0, 0, 1]
 	])
-	zRotMatrix = array([
-		[cos(camera.rot[2]), sin(camera.rot[2]), 0], # z-axis rotation matrix
-		[-sin(camera.rot[2]), cos(camera.rot[2]), 0],
-		[0, 0, 1],
+	zRotMatrix = array([					# z-axis rotation matrix
+		[cos(camera.rot[2]), sin(camera.rot[2]), 0, 0], 
+		[-sin(camera.rot[2]), cos(camera.rot[2]), 0, 0],
+		[0, 0, 1, 0],
+		[0, 0, 0, 1]
 	])
 	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
 
-	rotatedVertex = matmul(RotMatrix, vertex-camera.pos) #transform into camera space
+	camSpaceVertex = matmul(RotMatrix, append((vertex-camera.pos),1)) #transform into camera space
 
-	rotatedVertex[2] = 0.000001 if rotatedVertex[2] == 0 else rotatedVertex[2] # prevents division by zero
+	projectionMatrix = array([
+		[1/(tan(camera.FOV/2)), 0, 0, 0],
+		[0, 1/(tan(camera.FOV/2)/screen.aspectRatio), 0, 0],
+		[0, 0, ((-camera.nearZ-camera.farZ)/camera.nearZ-camera.farZ), ((2*camera.nearZ*camera.farZ)/camera.nearZ-camera.farZ)],
+		[0, 0, 1, 0]
+	])
 
-	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
-	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
+	clipSpaceVertex = matmul(camSpaceVertex,projectionMatrix)
 
-	projectedX = (projectedX*7) + (screen.width/2)
-	projectedY = (projectedY*7) + (screen.height/2)
+	#projectedX = clipSpaceVertex[0]/clipSpaceVertex[3]
+	#projectedY = clipSpaceVertex[1]/clipSpaceVertex[3]
+
+	projectedX = (clipSpaceVertex[0]/clipSpaceVertex[3]+1+camera.sX)*(screen.width/2)
+	projectedY = (clipSpaceVertex[1]/clipSpaceVertex[3]+1+camera.sY)*(screen.height/2)
 
 	return array([projectedX, projectedY], int32)
-
-def r(oldDegrees):
-	return deg2rad(oldDegrees)
-
-def d(oldRadians):
-	return rad2deg(oldRadians)
-
 
 Cube = Object(
 	array([0,0,0]),		#position

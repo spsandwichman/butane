@@ -51,7 +51,7 @@ def main():
 		Cube.rotate(array([0.01,0,0]))
 		Pyramid.rotate(array([0,0,0.03]))
 	
-		Pyramid.scale(array([1,1.01,1]))
+		#Pyramid.scale(array([1,1.01,1]))
 		
 
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
