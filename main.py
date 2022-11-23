@@ -27,7 +27,6 @@ def main():
 
 	running = True
 	# display loop
-	iterator = 1.01
 	while running:
 		
 		origin = project(array([0,0,0]), cam, screen)

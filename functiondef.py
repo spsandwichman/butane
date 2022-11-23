@@ -22,8 +22,44 @@ class Object:
 		self.updateWldSpaceVertexTable()
 
 	def updateWldSpaceVertexTable(self):
+
+		translationMatrix = array([				# translation matrix
+			[1, 0, 0, self.pos[0]],
+			[0, 1, 0, self.pos[1]],
+			[0, 0, 1, self.pos[2]],
+			[0, 0, 0, 1]])
+		
+		xRotMatrix = array([					# x-axis rotation matrix
+			[1, 0, 0, 0],
+			[0, cos(self.rot[0]), sin(self.rot[0]), 0],
+			[0, -sin(self.rot[0]), cos(self.rot[0]), 0],
+			[0, 0, 0, 1]
+		])
+		yRotMatrix = array([					# y-axis rotation matrix
+			[cos(self.rot[1]), 0, -sin(self.rot[1]), 0],
+			[0, 1, 0, 0],
+			[sin(self.rot[1]), 0, cos(self.rot[1]), 0],
+			[0, 0, 0, 1]
+		])
+		zRotMatrix = array([					# z-axis rotation matrix
+			[cos(self.rot[2]), sin(self.rot[2]), 0, 0], 
+			[-sin(self.rot[2]), cos(self.rot[2]), 0, 0],
+			[0, 0, 1, 0],
+			[0, 0, 0, 1]
+		])
+
+		rotationMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+
+		scaleMatrix = array([
+		[self.scl[0], 0, 0, 0],
+		[0, self.scl[1], 0, 0],
+		[0, 0, self.scl[2], 0],
+		[0, 0, 0, 1]])
+
+		transformationMatrix = matmul(matmul(translationMatrix, rotationMatrix), scaleMatrix)
+
 		for vertex in range(len(self.objSpaceVertexTable)):
-			self.wldSpaceVertexTable[vertex] = translateVector(rotateVector(scaleVector(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
+			self.wldSpaceVertexTable[vertex] = delete(matmul(transformationMatrix,append(self.objSpaceVertexTable[vertex],1).T).T,3)
 	
 	def projectAll(self, camera, screen):
 		for vertex in range(len(self.wldSpaceVertexTable)):
@@ -94,12 +130,12 @@ class Empty:
 		self.scl = newScl
 
 class Camera:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 50, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), verticalFieldOfView = 0, shiftX = 0, shiftY = 0):
 		self.pos = position
 		self.rot = rotation				#always in radians
 		self.rotDeg = rotation
 		self.scl = scale
-		self.fL = focalLength
+		self.vFOV = verticalFieldOfView
 		self.sX = shiftX
 		self.sY = shiftY
 
