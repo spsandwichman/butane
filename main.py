@@ -3,7 +3,7 @@ import pygame as pg
 
 def main():
 
-	screen = Screen(1000,1000)
+	screen = Screen(1000,500)
 	scene = Scene()
 
 	pg.init()
