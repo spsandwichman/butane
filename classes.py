@@ -1,11 +1,4 @@
-from numpy import *
-
-white = array([255, 255, 255])
-black = array([0, 0, 0])
-red = array([255, 0, 0])
-green = array([0, 255, 0])
-blue = array([0, 0, 255])
-
+from functions import *
 
 class Object:
 	def __init__(self, position, rotation, scale, objSpaceVertexTable, edgeTable, surfaceTable):
@@ -22,8 +15,44 @@ class Object:
 		self.updateWldSpaceVertexTable()
 
 	def updateWldSpaceVertexTable(self):
+
+		translationMatrix = array([				# translation matrix
+			[1, 0, 0, self.pos[0]],
+			[0, 1, 0, self.pos[1]],
+			[0, 0, 1, self.pos[2]],
+			[0, 0, 0, 1]])
+		
+		xRotMatrix = array([					# x-axis rotation matrix
+			[1, 0, 0, 0],
+			[0, cos(self.rot[0]), sin(self.rot[0]), 0],
+			[0, -sin(self.rot[0]), cos(self.rot[0]), 0],
+			[0, 0, 0, 1]
+		])
+		yRotMatrix = array([					# y-axis rotation matrix
+			[cos(self.rot[1]), 0, -sin(self.rot[1]), 0],
+			[0, 1, 0, 0],
+			[sin(self.rot[1]), 0, cos(self.rot[1]), 0],
+			[0, 0, 0, 1]
+		])
+		zRotMatrix = array([					# z-axis rotation matrix
+			[cos(self.rot[2]), sin(self.rot[2]), 0, 0], 
+			[-sin(self.rot[2]), cos(self.rot[2]), 0, 0],
+			[0, 0, 1, 0],
+			[0, 0, 0, 1]
+		])
+
+		rotationMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+
+		scaleMatrix = array([
+		[self.scl[0], 0, 0, 0],
+		[0, self.scl[1], 0, 0],
+		[0, 0, self.scl[2], 0],
+		[0, 0, 0, 1]])
+
+		transformationMatrix = matmul(matmul(translationMatrix, rotationMatrix), scaleMatrix)
+
 		for vertex in range(len(self.objSpaceVertexTable)):
-			self.wldSpaceVertexTable[vertex] = translateVertex(rotateVertex(scaleVertex(self.objSpaceVertexTable[vertex], self.scl), self.rot), self.pos) #  i am so sorry
+			self.wldSpaceVertexTable[vertex] = delete(matmul(transformationMatrix,append(self.objSpaceVertexTable[vertex],1).T).T,3)
 	
 	def projectAll(self, camera, screen):
 		for vertex in range(len(self.wldSpaceVertexTable)):
@@ -94,14 +123,16 @@ class Empty:
 		self.scl = newScl
 
 class Camera:
-	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), focalLength = 50, shiftX = 0, shiftY = 0):
+	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1]), fieldOfView = r(30), shiftX = 0, shiftY = 0, nearZ = 0.1, farZ = 5):
 		self.pos = position
 		self.rot = rotation				#always in radians
-		self.rotDeg = rotation
+		self.rotDeg = rotation			#rotation in degrees - do not write to except to change it to reflect self.rot
 		self.scl = scale
-		self.fL = focalLength
+		self.FOV = fieldOfView
 		self.sX = shiftX
 		self.sY = shiftY
+		self.nearZ = nearZ
+		self.farZ = farZ
 
 		for val in range(len(self.rotDeg)):
 			self.rotDeg[val] = d(self.rot[val])
@@ -135,9 +166,12 @@ class Camera:
 	def setScale(self, newScl):
 		self.scl = newScl
 	
-	def setFL(self, newFL):
-		self.fL = newFL
+	def setFOV(self, newFOV):
+		self.FOV = newFOV
 
+	def setZClipping(self, newNearZ, newFarZ):
+		self.nearZ = newNearZ
+		self.farZ = newFarZ
 
 class Screen:
 	def __init__(self, width, height):
@@ -145,11 +179,13 @@ class Screen:
 		self.res = (width, height)
 		self.height = height
 		self.width = width
+		self.aspectRatio = width/height
 	
 	def setResolution(self, newWidth, newHeight):
 		self.height = newHeight
 		self.width = newWidth
 		self.res = (newWidth, newHeight)
+		self.aspectRatio = newWidth/newHeight
 	
 	def drawPixel(self, point, color):
 		pixelX, pixelY = point
@@ -168,8 +204,8 @@ class Screen:
 		error = dx + dy
 	
 		while True:
-			if (x0 >= self.width or y0 >= self.height) or (x0 < 0 or y0 < 0): #if i try to draw off the screen array, just /dont/
-				return
+			# if (x0 >= self.width or y0 >= self.height) or (x0 < 0 or y0 < 0): #if i try to draw off the screen array, just /dont/
+			# 	return
 			self.drawPixel((x0, y0), color)
 			if (x0 == x1) and (y0 == y1):
 				break
@@ -186,13 +222,10 @@ class Screen:
 				y0 = y0 + sy
 		
 	def fill(self, color):
-		for row in range(self.width):
-			for column in range(self.height):
-				self.drawPixel((row, column), color)
+		self.pixels = full((self.width, self.height, 3), color)
 	
 	def clear(self):
 		self.pixels = full((self.width, self.height, 3), 0, dtype=uint8)
-
 
 class Scene:
 	def __init__(self, backgroundColor = array([0,0,0])):
@@ -201,74 +234,9 @@ class Scene:
 
 	def addObjectToScene(self, obj):
 		self.objectCollection = append(self.objectCollection, obj)
-
-
-
-
-def translateVertex(vertex, trn):
-	return vertex+trn
-
-def rotateVertex(vertex, rot, origin = array([0,0,0])):
-
-	xRotMatrix = array([ 				# x-axis rotation matrix
-		[1, 0, 0],
-		[0, cos(rot[0]), sin(rot[0])],
-		[0, -sin(rot[0]), cos(rot[0])],
-	])
-	yRotMatrix = array([
-		[cos(rot[1]), 0, -sin(rot[1])], # y-axis rotation matrix
-		[0, 1, 0],
-		[sin(rot[1]), 0, cos(rot[1])],
-	])
-	zRotMatrix = array([
-		[cos(rot[2]), sin(rot[2]), 0], # z-axis rotation matrix
-		[-sin(rot[2]), cos(rot[2]), 0],
-		[0, 0, 1],
-	])
-	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
-
-	return (matmul((vertex - origin).T, RotMatrix).T) + origin # magic
-
-def scaleVertex(vertex, scl, origin = array([0,0,0])): 
-	return ((vertex - origin) * scl) + origin
-
-def project(vertex, camera, screen):
-
-	xRotMatrix = array([ 				# x-axis rotation matrix
-		[1, 0, 0],
-		[0, cos(camera.rot[0]), sin(camera.rot[0])],
-		[0, -sin(camera.rot[0]), cos(camera.rot[0])],
-	])
-	yRotMatrix = array([
-		[cos(camera.rot[1]), 0, -sin(camera.rot[1])], # y-axis rotation matrix
-		[0, 1, 0],
-		[sin(camera.rot[1]), 0, cos(camera.rot[1])],
-	])
-	zRotMatrix = array([
-		[cos(camera.rot[2]), sin(camera.rot[2]), 0], # z-axis rotation matrix
-		[-sin(camera.rot[2]), cos(camera.rot[2]), 0],
-		[0, 0, 1],
-	])
-	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
-
-	rotatedVertex = matmul(RotMatrix, vertex-camera.pos) #transform into camera space
-
-	rotatedVertex[2] = 0.000001 if rotatedVertex[2] == 0 else rotatedVertex[2] # prevents division by zero
-
-	projectedX = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[0] ) + camera.sX	#project onto view plane
-	projectedY = ( ( camera.fL / rotatedVertex[2] ) * rotatedVertex[1] ) + camera.sY	#project onto view plane
-
-	projectedX = (projectedX*7) + (screen.width/2)
-	projectedY = (projectedY*7) + (screen.height/2)
-
-	return array([projectedX, projectedY], int32)
-
-def r(oldDegrees):
-	return deg2rad(oldDegrees)
-
-def d(oldRadians):
-	return rad2deg(oldRadians)
-
+	
+	def setBackground(self, color):
+		self.bg = color
 
 Cube = Object(
 	array([0,0,0]),		#position
@@ -348,3 +316,23 @@ Pyramid = Object(
 		[6,7,8]])			#5
 )
 
+Plane = Object(
+	array([0,0,0]),		#position
+	array([0,0,0]),		#rotation
+	array([1,1,1]),		#scale
+	array([				#vertex table
+		[-1,-1, 0],			#0
+		[-1, 1, 0],			#1
+		[ 1,-1, 0],			#2
+		[ 1, 1, 0]],		#3
+		dtype=float),
+	array([				#edge table
+		[0,1],				#0
+		[0,2],				#1
+		[0,3],				#2
+		[1,3],				#3
+		[2,3]]),			#4
+	array([				#surface table
+		[0,2,3],			#0
+		[1,2,4]])		    #1
+)
