@@ -3,7 +3,7 @@ import pygame as pg
 
 def main():
 
-	screen = Screen(1000,500)
+	screen = Screen(1000,1000)
 	scene = Scene()
 	
 	pg.init()
@@ -17,11 +17,15 @@ def main():
 	cam.setPosition(array([-1.5, 6, 1]))
 	cam.setRotation(array([r(-90), 0, 0]))
 
-	Pyramid.setPosition(array([-3, 0, 0]))
+	Cube.setPosition(array([1.5, 0, 0]))
+	Pyramid.setPosition(array([-1.5, 0, 0]))
+
+	Plane.setPosition(array([0, 0, -1]))
+	Plane.setScale(array([4,4,4])) 
 
 	scene.addObjectToScene(Cube)
 	scene.addObjectToScene(Pyramid)
-
+	#scene.addObjectToScene(Plane)
 
 
 	running = True
@@ -47,7 +51,7 @@ def main():
 			for vertex in obj.projectedVertexTable:
 				screen.drawPixel(vertex, red)
 		
-		Cube.rotate(array([0.01,0,0]))
+		Cube.rotate(array([0,0,-0.01]))
 		Pyramid.rotate(array([0,0,0.03]))
 	
 		#Pyramid.scale(array([1,1.01,1]))

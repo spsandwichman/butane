@@ -200,8 +200,8 @@ class Screen:
 		error = dx + dy
 	
 		while True:
-			if (x0 >= self.width or y0 >= self.height) or (x0 < 0 or y0 < 0): #if i try to draw off the screen array, just /dont/
-				return
+			# if (x0 >= self.width or y0 >= self.height) or (x0 < 0 or y0 < 0): #if i try to draw off the screen array, just /dont/
+			# 	return
 			self.drawPixel((x0, y0), color)
 			if (x0 == x1) and (y0 == y1):
 				break
@@ -309,4 +309,25 @@ Pyramid = Object(
 		[1,3,7],			#3
 		[4,5,8],			#4
 		[6,7,8]])			#5
+)
+
+Plane = Object(
+	array([0,0,0]),		#position
+	array([0,0,0]),		#rotation
+	array([1,1,1]),		#scale
+	array([				#vertex table
+		[-1,-1, 0],			#0
+		[-1, 1, 0],			#1
+		[ 1,-1, 0],			#2
+		[ 1, 1, 0]],		#3
+		dtype=float),
+	array([				#edge table
+		[0,1],				#0
+		[0,2],				#1
+		[0,3],				#2
+		[1,3],				#3
+		[2,3]]),			#4
+	array([				#surface table
+		[0,2,3],			#0
+		[1,2,4]])		    #1
 )
