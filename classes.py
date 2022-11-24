@@ -169,6 +169,10 @@ class Camera:
 	def setFOV(self, newFOV):
 		self.FOV = newFOV
 
+	def setZClipping(self, newNearZ, newFarZ):
+		self.nearZ = newNearZ
+		self.farZ = newFarZ
+
 class Screen:
 	def __init__(self, width, height):
 		self.pixels = full((width, height, 3), 0, dtype=uint8)
@@ -218,9 +222,7 @@ class Screen:
 				y0 = y0 + sy
 		
 	def fill(self, color):
-		for row in range(self.width):
-			for column in range(self.height):
-				self.drawPixel((row, column), color)
+		self.pixels = full((self.width, self.height, 3), color)
 	
 	def clear(self):
 		self.pixels = full((self.width, self.height, 3), 0, dtype=uint8)
@@ -232,6 +234,9 @@ class Scene:
 
 	def addObjectToScene(self, obj):
 		self.objectCollection = append(self.objectCollection, obj)
+	
+	def setBackground(self, color):
+		self.bg = color
 
 Cube = Object(
 	array([0,0,0]),		#position
