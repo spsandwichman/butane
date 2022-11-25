@@ -19,7 +19,7 @@ def translateVector(vector, trn):
 		[0, 0, 1, trn[2]],
 		[0, 0, 0, 1]])
 	
-	return delete(matmul(translationMatrix,append(vector,1).T).T,3)
+	return delete((translationMatrix @ append(vector,1).T).T,3)
 
 def rotateVector(vector, rot, origin = array([0,0,0])):
 
@@ -41,9 +41,9 @@ def rotateVector(vector, rot, origin = array([0,0,0])):
 		[0, 0, 1, 0],
 		[0, 0, 0, 1]
 	])
-	rotationMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+	rotationMatrix = xRotMatrix @ yRotMatrix @ zRotMatrix #compound rotation matrix
 
-	return delete(matmul(rotationMatrix,append((vector-origin),1).T).T,3)+origin
+	return delete((rotationMatrix @ append((vector-origin),1).T).T,3)+origin
 
 def scaleVector(vector, scl, origin = array([0,0,0])): 
 	scaleMatrix = array([
@@ -52,9 +52,9 @@ def scaleVector(vector, scl, origin = array([0,0,0])):
 		[0, 0, scl[2], 0],
 		[0, 0, 0, 1]])
 	
-	return delete(matmul(scaleMatrix,append((vector-origin),1).T).T,3)+origin
+	return delete((scaleMatrix @ append((vector-origin),1).T).T,3)+origin
 
-def project(vertex, camera, screen):
+def clipSpace(vertex, camera, screen):
 
 	xRotMatrix = array([					# x-axis rotation matrix
 		[1, 0, 0, 0],
@@ -74,9 +74,9 @@ def project(vertex, camera, screen):
 		[0, 0, 1, 0],
 		[0, 0, 0, 1]
 	])
-	RotMatrix = matmul(matmul(xRotMatrix, yRotMatrix), zRotMatrix) #compound rotation matrix
+	RotMatrix = xRotMatrix @ yRotMatrix @ zRotMatrix #compound rotation matrix
 
-	camSpaceVertex = matmul(RotMatrix, append((vertex-camera.pos),1)) #transform into camera space
+	camSpaceVertex = RotMatrix @ append((vertex-camera.pos),1) #transform into camera space
 
 	projectionMatrix = array([
 		[1/(tan(camera.FOV/2)), 0, 0, 0],
@@ -85,12 +85,14 @@ def project(vertex, camera, screen):
 		[0, 0, 1, 0]
 	])
 
-	clipSpaceVertex = matmul(camSpaceVertex,projectionMatrix)
+	return matmul(camSpaceVertex, projectionMatrix)
 
-	#projectedX = clipSpaceVertex[0]/clipSpaceVertex[3]
-	#projectedY = clipSpaceVertex[1]/clipSpaceVertex[3]
+def imageSpace(clipSpaceVertex, camera, screen):
 
-	projectedX = (clipSpaceVertex[0]/clipSpaceVertex[3]+1+camera.sX)*(screen.width/2)
-	projectedY = (clipSpaceVertex[1]/clipSpaceVertex[3]+1+camera.sY)*(screen.height/2)
+	return array([(clipSpaceVertex[0]/clipSpaceVertex[3]+camera.sX),(clipSpaceVertex[1]/clipSpaceVertex[3]+camera.sY)])
 
-	return array([projectedX, projectedY], int32)
+def screenSpace(imageSpaceVertex, screen):
+	projectedX = (imageSpaceVertex[0]+1)*(screen.width/2)
+	projectedY = (imageSpaceVertex[1]+1)*(screen.height/2)
+
+	return array([(imageSpaceVertex[0]+1)*(screen.width/2),(imageSpaceVertex[1]+1)*(screen.height/2)], dtype=int)
