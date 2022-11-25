@@ -14,8 +14,8 @@ def main():
 	clock = pg.time.Clock()
 
 	cam = Camera()
-	cam.setPosition(array([1.5, 7.5, 5]))
-	cam.setRotation(array([r(239), 0, r(180)]))
+	cam.setPosition(array([0, 5, 0]))
+	cam.setRotation(array([r(-90), 0, r(180)]))
 	cam.setFOV(d(90))
 	cam.setZClipping(0.1,20)
 
@@ -26,11 +26,12 @@ def main():
 	Plane.setScale(array([4,4,4]))
 
 	Igloo.setScale(array([3,3,3]))
+	Axis.setScale(array([0.5,0.5,0.5]))
 
-	scene.addObjectToScene(Plane)
+	#scene.addObjectToScene(Plane)
 	#scene.addObjectToScene(Cube)
 	#scene.addObjectToScene(Pyramid)
-	scene.addObjectToScene(Igloo)
+	scene.addObjectToScene(Dodeca)
 	scene.addObjectToScene(Axis)
 	scene.setBackground(array([10,10,10]))
 	#scene.setBackfaceCulling(False)
@@ -85,9 +86,9 @@ def main():
 
 
 
-		Cube.rotate(array([0,0,-0.01]))
-		Pyramid.rotate(array([0,0,0.03]))
-		Igloo.rotate(array([0,0,0.03]))
+		#Cube.rotate(array([0,0,-0.01]))
+		#Pyramid.rotate(array([0,0,0.03]))
+		Dodeca.rotate(array([0,0,0.01]))
 
 
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
