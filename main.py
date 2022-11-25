@@ -14,8 +14,10 @@ def main():
 	clock = pg.time.Clock()
 
 	cam = Camera()
-	cam.setPosition(array([-1.5, 6, 1]))
-	cam.setRotation(array([r(-90), 0, 0]))
+	cam.setPosition(array([1.5, 7.5, 5]))
+	cam.setRotation(array([r(239), 0, r(180)]))
+	cam.setFOV(d(90))
+	cam.setZClipping(0.1,20)
 
 	Cube.setPosition(array([1.5, 0, 0]))
 	Pyramid.setPosition(array([-1.5, 0, 0]))
@@ -28,7 +30,8 @@ def main():
 	scene.addObjectToScene(Plane)
 	#scene.addObjectToScene(Cube)
 	#scene.addObjectToScene(Pyramid)
-	scene.addObjectToScene(Dodeca)
+	scene.addObjectToScene(Igloo)
+	scene.addObjectToScene(Axis)
 	scene.setBackground(array([10,10,10]))
 	#scene.setBackfaceCulling(False)
 
@@ -51,14 +54,21 @@ def main():
 				if scene.backfaceCulling and (dot(normalVector, cameraToTriangleVector) >= 0):
 					continue # skip over any triangles that are not facing the camera
 				
-				clipSpaceV0 = clipSpace(v0, cam, screen)
-				clipSpaceV1 = clipSpace(v1, cam, screen)
-				clipSpaceV2 = clipSpace(v2, cam, screen)
+				cameraSpaceV0 = cameraSpace(v0, cam)
+				cameraSpaceV1 = cameraSpace(v1, cam)
+				cameraSpaceV2 = cameraSpace(v2, cam)
 
+				clipSpaceV0 = clipSpace(cameraSpaceV0, cam, screen)
+				clipSpaceV1 = clipSpace(cameraSpaceV1, cam, screen)
+				clipSpaceV2 = clipSpace(cameraSpaceV2, cam, screen)
 
-				imageSpaceV0 = imageSpace(clipSpaceV0, cam, screen)
-				imageSpaceV1 = imageSpace(clipSpaceV1, cam, screen)
-				imageSpaceV2 = imageSpace(clipSpaceV2, cam, screen)
+				if not (isInClipSpace(clipSpaceV0) and isInClipSpace(clipSpaceV1) and isInClipSpace(clipSpaceV2)):
+					continue
+					
+
+				imageSpaceV0 = imageSpace(clipSpaceV0, cam)
+				imageSpaceV1 = imageSpace(clipSpaceV1, cam)
+				imageSpaceV2 = imageSpace(clipSpaceV2, cam)
 
 				screenSpaceV0 = screenSpace(imageSpaceV0, screen)
 				screenSpaceV1 = screenSpace(imageSpaceV1, screen)
@@ -77,7 +87,7 @@ def main():
 
 		Cube.rotate(array([0,0,-0.01]))
 		Pyramid.rotate(array([0,0,0.03]))
-		Dodeca.rotate(array([0,0,0.03]))
+		Igloo.rotate(array([0,0,0.03]))
 
 
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
@@ -107,6 +117,10 @@ def main():
 					cam.rotate(array([0, 0, r(5)]))
 				if event.key == pg.K_RIGHT:
 					cam.rotate(array([0, 0, r(-5)]))
+				if event.key == pg.K_EQUALS:
+					cam.setFOV(cam.FOV + r(1))
+				if event.key == pg.K_MINUS:
+					cam.setFOV(cam.FOV - r(1))
 
 
 		# screen.fill(scene.bg)

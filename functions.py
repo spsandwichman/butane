@@ -54,8 +54,7 @@ def scaleVector(vector, scl, origin = array([0,0,0])):
 	
 	return delete((scaleMatrix @ append((vector-origin),1).T).T,3)+origin
 
-def clipSpace(vertex, camera, screen):
-
+def cameraSpace(vertex, camera):
 	xRotMatrix = array([					# x-axis rotation matrix
 		[1, 0, 0, 0],
 		[0, cos(camera.rot[0]), sin(camera.rot[0]), 0],
@@ -76,23 +75,29 @@ def clipSpace(vertex, camera, screen):
 	])
 	RotMatrix = xRotMatrix @ yRotMatrix @ zRotMatrix #compound rotation matrix
 
-	camSpaceVertex = RotMatrix @ append((vertex-camera.pos),1) #transform into camera space
+	return RotMatrix @ append((vertex-camera.pos),1) #transform into camera space
+
+def clipSpace(camSpaceVertex, camera, screen):
 
 	projectionMatrix = array([
-		[1/(tan(camera.FOV/2)), 0, 0, 0],
-		[0, 1/(tan(camera.FOV/2)/screen.aspectRatio), 0, 0],
-		[0, 0, ((-camera.nearZ-camera.farZ)/camera.nearZ-camera.farZ), ((2*camera.nearZ*camera.farZ)/camera.nearZ-camera.farZ)],
-		[0, 0, 1, 0]
+		[-(tan(camera.FOV/2)), 0, 0, 0],
+		[0, (tan(camera.FOV/2)*screen.aspectRatio), 0, 0],
+		[0, 0, ((camera.nearZ+camera.farZ)/(camera.farZ-camera.nearZ)), 1],
+		[0, 0, ((2*camera.nearZ*camera.farZ)/(camera.nearZ-camera.farZ)), 0]
 	])
 
 	return matmul(camSpaceVertex, projectionMatrix)
 
-def imageSpace(clipSpaceVertex, camera, screen):
+def imageSpace(clipSpaceVertex, camera):
 
 	return array([(clipSpaceVertex[0]/clipSpaceVertex[3]+camera.sX),(clipSpaceVertex[1]/clipSpaceVertex[3]+camera.sY)])
 
 def screenSpace(imageSpaceVertex, screen):
-	projectedX = (imageSpaceVertex[0]+1)*(screen.width/2)
-	projectedY = (imageSpaceVertex[1]+1)*(screen.height/2)
 
 	return array([(imageSpaceVertex[0]+1)*(screen.width/2),(imageSpaceVertex[1]+1)*(screen.height/2)], dtype=int)
+
+def isInClipSpace(clipSpaceV):
+	return ((-clipSpaceV[3] <= clipSpaceV[0] <= clipSpaceV[3]) 
+	and (-clipSpaceV[3] <= clipSpaceV[1] <= clipSpaceV[3]) 
+	and (-clipSpaceV[3] <= clipSpaceV[2] <= clipSpaceV[3])
+	)

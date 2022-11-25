@@ -1,4 +1,4 @@
 TODO:
     - GPU ACCELERATION
-    - frustum culling
+    - frustum culling (done... sort of)
     - tri coloring

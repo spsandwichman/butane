@@ -350,7 +350,6 @@ def LoadObjectfromOBJ(filename):
 
 	vertexTable = reshape(vertexTable, (int(len(vertexTable)/3), 3))
 	triTable = reshape(triTable, (int(len(triTable)/3), 3))
-	print(triTable)
 	
 	file.close()
 
@@ -371,3 +370,5 @@ Suzanne = LoadObjectfromOBJ("suzanne.obj")
 Dodeca = LoadObjectfromOBJ("Dodecahedron.obj")
 
 Igloo = LoadObjectfromOBJ("igloo.obj")
+
+Axis = LoadObjectfromOBJ("axis.obj")
