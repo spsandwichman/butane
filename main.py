@@ -14,8 +14,10 @@ def main():
 	clock = pg.time.Clock()
 
 	cam = Camera()
-	cam.setPosition(array([-1.5, 6, 1]))
-	cam.setRotation(array([r(-90), 0, 0]))
+	cam.setPosition(array([0, 5, 0]))
+	cam.setRotation(array([r(-90), 0, r(180)]))
+	cam.setFOV(d(90))
+	cam.setZClipping(0.1,20)
 
 	Cube.setPosition(array([1.5, 0, 0]))
 	Pyramid.setPosition(array([-1.5, 0, 0]))
@@ -23,39 +25,70 @@ def main():
 	Plane.setPosition(array([0, 0, -1]))
 	Plane.setScale(array([4,4,4]))
 
-	scene.addObjectToScene(Cube)
-	scene.addObjectToScene(Pyramid)
-	scene.addObjectToScene(Plane)
+	Igloo.setScale(array([3,3,3]))
+	Axis.setScale(array([0.5,0.5,0.5]))
+
+	#scene.addObjectToScene(Plane)
+	#scene.addObjectToScene(Cube)
+	#scene.addObjectToScene(Pyramid)
+	scene.addObjectToScene(Dodeca)
+	scene.addObjectToScene(Axis)
 	scene.setBackground(array([10,10,10]))
+	#scene.setBackfaceCulling(False)
 
 
 	running = True
 	# display loop
 	while running:
 
-		origin = project(array([0,0,0]), cam, screen)
-		unitVectorX = project(array([1,0,0]), cam, screen)
-		unitVectorY = project(array([0,1,0]), cam, screen)
-		unitVectorZ = project(array([0,0,1]), cam, screen)
-
-		screen.drawLine(unitVectorX, origin, red)
-		screen.drawLine(unitVectorY, origin, green)
-		screen.drawLine(unitVectorZ, origin, blue)
-		screen.drawPixel(origin, white)
-
-
-		#SCENE RENDERING
+		#SCENE RENDERING PIPELINE - TRIANGLE BY TRIANGLE
 		for obj in scene.objectCollection:
-			obj.projectAll(cam, screen)
-			for edge in obj.edgeTable:
-				screen.drawLine(obj.projectedVertexTable[edge[0]], obj.projectedVertexTable[edge[1]], white)
-			for vertex in obj.projectedVertexTable:
-				screen.drawPixel(vertex, red)
+			for tri in obj.triTable:
+				v0 = obj.wldSpaceVertexTable[int(tri[0])].copy()
+				v1 = obj.wldSpaceVertexTable[int(tri[1])].copy()
+				v2 = obj.wldSpaceVertexTable[int(tri[2])].copy()
 
-		Cube.rotate(array([0,0,-0.01]))
-		Pyramid.rotate(array([0,0,0.03]))
+				normalVector = cross((v0-v1),(v1-v2)) / linalg.norm(cross((v0-v1),(v1-v2))) # calculates normal vector from normalized cross product
+				averagePosition = array([(v0[0]+v1[0]+v2[0])/3,(v0[1]+v1[1]+v2[1])/3,(v0[2]+v1[2]+v2[2])/3]) # mean position of all points in triangle
+				cameraToTriangleVector = averagePosition - cam.pos
+				
+				if scene.backfaceCulling and (dot(normalVector, cameraToTriangleVector) >= 0):
+					continue # skip over any triangles that are not facing the camera
+				
+				cameraSpaceV0 = cameraSpace(v0, cam)
+				cameraSpaceV1 = cameraSpace(v1, cam)
+				cameraSpaceV2 = cameraSpace(v2, cam)
 
-		#Pyramid.scale(array([1,1.01,1]))
+				clipSpaceV0 = clipSpace(cameraSpaceV0, cam, screen)
+				clipSpaceV1 = clipSpace(cameraSpaceV1, cam, screen)
+				clipSpaceV2 = clipSpace(cameraSpaceV2, cam, screen)
+
+				if not (isInClipSpace(clipSpaceV0) and isInClipSpace(clipSpaceV1) and isInClipSpace(clipSpaceV2)):
+					continue
+					
+
+				imageSpaceV0 = imageSpace(clipSpaceV0, cam)
+				imageSpaceV1 = imageSpace(clipSpaceV1, cam)
+				imageSpaceV2 = imageSpace(clipSpaceV2, cam)
+
+				screenSpaceV0 = screenSpace(imageSpaceV0, screen)
+				screenSpaceV1 = screenSpace(imageSpaceV1, screen)
+				screenSpaceV2 = screenSpace(imageSpaceV2, screen)
+
+				screen.drawLine(screenSpaceV0, screenSpaceV1, white)
+				screen.drawLine(screenSpaceV1, screenSpaceV2, white)
+				screen.drawLine(screenSpaceV2, screenSpaceV0, white)
+				#screen.drawTriangle(screenSpaceV0, screenSpaceV1, screenSpaceV2, white)
+
+
+
+
+
+
+
+		#Cube.rotate(array([0,0,-0.01]))
+		#Pyramid.rotate(array([0,0,0.03]))
+		Dodeca.rotate(array([0,0,0.01]))
 
 
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
@@ -66,9 +99,9 @@ def main():
 				if event.key == pg.K_ESCAPE:
 					running = False
 				if event.key == pg.K_w:
-					cam.translate(array([0, 0, -0.5]))
-				if event.key == pg.K_s:
 					cam.translate(array([0, 0, 0.5]))
+				if event.key == pg.K_s:
+					cam.translate(array([0, 0, -0.5]))
 				if event.key == pg.K_a:
 					cam.translate(array([0.5, 0, 0]))
 				if event.key == pg.K_d:
@@ -78,13 +111,17 @@ def main():
 				if event.key == pg.K_SPACE:
 					cam.translate(array([0, -0.5, 0]))
 				if event.key == pg.K_UP:
-					cam.rotate(array([r(-10), 0, 0]))
+					cam.rotate(array([r(-5), 0, 0]))
 				if event.key == pg.K_DOWN:
-					cam.rotate(array([r(10), 0, 0]))
+					cam.rotate(array([r(5), 0, 0]))
 				if event.key == pg.K_LEFT:
-					cam.rotate(array([0, 0, r(10)]))
+					cam.rotate(array([0, 0, r(5)]))
 				if event.key == pg.K_RIGHT:
-					cam.rotate(array([0, 0, r(-10)]))
+					cam.rotate(array([0, 0, r(-5)]))
+				if event.key == pg.K_EQUALS:
+					cam.setFOV(cam.FOV + r(1))
+				if event.key == pg.K_MINUS:
+					cam.setFOV(cam.FOV - r(1))
 
 
 		# screen.fill(scene.bg)
