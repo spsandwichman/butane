@@ -368,4 +368,6 @@ Sphere = LoadObjectfromOBJ("uvsphere.obj")
 
 Suzanne = LoadObjectfromOBJ("suzanne.obj")
 
+Dodeca = LoadObjectfromOBJ("Dodecahedron.obj")
+
 Igloo = LoadObjectfromOBJ("igloo.obj")

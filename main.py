@@ -28,7 +28,7 @@ def main():
 	scene.addObjectToScene(Plane)
 	#scene.addObjectToScene(Cube)
 	#scene.addObjectToScene(Pyramid)
-	scene.addObjectToScene(Igloo)
+	scene.addObjectToScene(Dodeca)
 	scene.setBackground(array([10,10,10]))
 	#scene.setBackfaceCulling(False)
 
@@ -77,7 +77,7 @@ def main():
 
 		Cube.rotate(array([0,0,-0.01]))
 		Pyramid.rotate(array([0,0,0.03]))
-		Igloo.rotate(array([0,0,0.03]))
+		Dodeca.rotate(array([0,0,0.03]))
 
 
 		pg.surfarray.blit_array(pgscreen, screen.pixels)
