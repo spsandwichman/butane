@@ -22,13 +22,12 @@ def main():
 	Cube.setPosition(array([1.5, 0, 0]))
 	Pyramid.setPosition(array([-1.5, 0, 0]))
 
-	Plane.setPosition(array([0, 0, -1]))
-	Plane.setScale(array([4,4,4]))
+	Grid.setPosition(array([0, 0, -1]))
 
 	Igloo.setScale(array([3,3,3]))
 	Axis.setScale(array([0.5,0.5,0.5]))
 
-	#scene.addObjectToScene(Plane)
+	scene.addObjectToScene(Grid)
 	#scene.addObjectToScene(Cube)
 	#scene.addObjectToScene(Pyramid)
 	scene.addObjectToScene(Dodeca)
@@ -111,9 +110,9 @@ def main():
 				if event.key == pg.K_SPACE:
 					cam.translate(array([0, -0.5, 0]))
 				if event.key == pg.K_UP:
-					cam.rotate(array([r(-5), 0, 0]))
-				if event.key == pg.K_DOWN:
 					cam.rotate(array([r(5), 0, 0]))
+				if event.key == pg.K_DOWN:
+					cam.rotate(array([r(-5), 0, 0]))
 				if event.key == pg.K_LEFT:
 					cam.rotate(array([0, 0, r(5)]))
 				if event.key == pg.K_RIGHT:

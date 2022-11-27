@@ -175,12 +175,6 @@ class Screen:
 		self.width = width
 		self.aspectRatio = width/height
 	
-	def setResolution(self, newWidth, newHeight):
-		self.height = newHeight
-		self.width = newWidth
-		self.res = (newWidth, newHeight)
-		self.aspectRatio = newWidth/newHeight
-	
 	def drawPixel(self, point, color):
 		pixelX, pixelY = point
 		# print(str(pX) + ' ' + str(pY))
@@ -372,3 +366,5 @@ Dodeca = LoadObjectfromOBJ("Dodecahedron.obj")
 Igloo = LoadObjectfromOBJ("igloo.obj")
 
 Axis = LoadObjectfromOBJ("axis.obj")
+
+Grid = LoadObjectfromOBJ("grid.obj")
