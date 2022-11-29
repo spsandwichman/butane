@@ -80,12 +80,11 @@ class Object:
 		self.scl = newScl
 		self.updateWldSpaceVertexTable()
 	
-	def setGeometry(self, newObjVertexTable, newEdgeTable, newSurfaceTable):
+	def setGeometry(self, newObjVertexTable, newTriTable):
 		self.objSpaceVertexTable = newObjVertexTable
 		self.wldSpaceVertexTable = newObjVertexTable
 		self.updateWldSpaceVertexTable()
-		self.edgeTable = newEdgeTable
-		self.surfaceTable = newSurfaceTable
+		self.triTable = newTriTable
 
 class Empty:
 	def __init__(self, position = array([0,0,0]), rotation = array([0,0,0]), scale = array([1,1,1])):
