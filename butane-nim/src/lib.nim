@@ -3,30 +3,24 @@ import std/math
 import boxy, windy
 
 
+# ---------------------------------- colors ---------------------------------- #
+
+const white* = rgb(255,255,255)
+const black* = rgb(0,0,0)
+const red* = rgb(0,0,0)
+
 # ----------------------------------- utils ---------------------------------- #
 
-
-proc cross*(a,b: array[3,float]): array[3,float] =
-    result = [a[1]*b[2] - a[2]*b[1], a[2]*b[1] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]]
-
-proc dot*(a, b: array[3,float]): float =
-  for i in a.low..a.high:
-    result += a[i] * b[i]
-
-proc magnitude*(v: array[3,float]): float =
-    result = sqrt(v[0]^2 + v[1]^2 + v[2]^2)
-
-
-proc `+` *(a, b: array[3,float]): array[3,float] =  # element-wise addition of 3d vectors
+proc `>+` *(a, b: array[3,float]): array[3,float] =  # element-wise addition of 3d vectors
     result = [a[0]+b[0],a[1]+b[1],a[2]+b[2]]
 
-proc `-` *(a, b: array[3,float]): array[3,float] = # element-wise subtraction of 3d vectors
+proc `>-` *(a, b: array[3,float]): array[3,float] = # element-wise subtraction of 3d vectors
     result = [a[0]-b[0],a[1]-b[1],a[2]-b[2]]
 
-proc `*` *(a, b: array[3,float]): array[3,float] = # element-wise multiplication of 3d vectors
+proc `>*` *(a, b: array[3,float]): array[3,float] = # element-wise multiplication of 3d vectors
     result = [a[0]*b[0],a[1]*b[1],a[2]*b[2]]
 
-proc `/` *(a, b: array[3,float]): array[3,float] = # element-wise division of 3d vectors
+proc `>/` *(a, b: array[3,float]): array[3,float] = # element-wise division of 3d vectors
     result = [a[0]/b[0],a[1]/b[1],a[2]/b[2]]
 
 proc `**` *(a, b: array[4,array[4,float]]): array[4,array[4,float]] = # 4x4 matrix * 4x4 matrix
@@ -46,8 +40,8 @@ proc translationMatrix*(trn: array[3,float]): array[4,array[4,float]] =
 
 proc rotationMatrix*(rot: array[3,float]): array[4,array[4,float]] =
     var xRotMatrix = [[1.0,0.0,0.0,0.0],
-                      [1.0,cos(rot[0]), sin(rot[0]),0.0],
-                      [1.0,-sin(rot[0]), cos(rot[0]),0.0],
+                      [0.0,cos(rot[0]), sin(rot[0]),0.0],
+                      [0.0,-sin(rot[0]), cos(rot[0]),0.0],
                       [0.0,0.0,0.0,1.0]]
     var yRotMatrix = [[cos(rot[1]),0.0,-sin(rot[1]),0.0],
                       [0.0,1.0,0.0,0.0],
@@ -72,19 +66,34 @@ proc dUp*(x: array[3,float]): array[4,float] = #adds 1.0 element to 3d vector, r
     result = [x[0],x[1],x[2],1.0]
 
 proc r*(oldDegrees: float): float =
-    result = oldDegrees * PI / 180
+    result = oldDegrees * (PI / 180.0)
 
 proc d*(oldRadians: float): float =
-    result = oldRadians * 180 / PI
+    result = oldRadians * (180.0 / PI)
 
 proc translateVector*(vector, trn: array[3, float]): array[3,float] =
-    result = vector + trn
+    result = vector >+ trn
 
 proc rotateVector*(vector, rot, origin: array[3, float]): array[3,float] =
-    result = dDown(dUp(vector-origin) ** rotationMatrix(rot)) + origin
+    result = dDown(dUp(vector>-origin) ** rotationMatrix(rot)) >+ origin
     
 proc scaleVector*(vector, scl, origin: array[3, float]): array[3,float] =
-    result = ((vector - origin) * scl) + origin
+    result = ((vector >- origin) >* scl) >+ origin
+
+proc cross*(a,b: array[3,float]): array[3,float] =
+    result = [a[1]*b[2] - a[2]*b[1], a[2]*b[1] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]]
+
+proc dot*(a, b: array[3,float]): float =
+  for i in a.low..a.high:
+    result += a[i] * b[i]
+
+proc magnitude*(v: array[3,float]): float =
+    result = sqrt(v[0]^2 + v[1]^2 + v[2]^2)
+
+proc triangleNormal*(v0,v1,v2: array[3,float]): array[3,float] =
+    let unNormalizedNormal = cross((v0>-v1),(v1>-v2))
+    let m = magnitude(unNormalizedNormal)
+    result = unNormalizedNormal >/ [m,m,m]
 
 # ------------------------------- MeshObject class ------------------------------- #
 type
@@ -99,7 +108,7 @@ type
 
 proc updateWldSpaceVertexTable*(this: var MeshObject) =
     for v in 0..(len(this.wldSpaceVertexTable)-1):
-        this.wldSpaceVertexTable[v] = dDown(dUp(this.objSpaceVertexTable[v]) ** translationMatrix(this.pos) ** rotationMatrix(this.rot) ** scaleMatrix(this.scl))
+        this.wldSpaceVertexTable[v] = dDown(dUp(this.objSpaceVertexTable[v]) ** (translationMatrix(this.pos) ** (rotationMatrix(this.rot) ** scaleMatrix(this.scl))))
 
 proc initMeshObject*(p = [0.0,0.0,0.0], r = [0.0,0.0,0.0], s = [1.0,1.0,1.0], osvt: seq[array[3, float]], tt: seq[array[3, int]]): MeshObject =
     result = MeshObject(pos: p, rot: r, rotDeg : r, scl: s, objSpaceVertexTable: osvt, wldSpaceVertexTable: osvt, triTable: tt) 
@@ -108,17 +117,17 @@ proc initMeshObject*(p = [0.0,0.0,0.0], r = [0.0,0.0,0.0], s = [1.0,1.0,1.0], os
     result.updateWldSpaceVertexTable()
 
 proc changePosition*(this: var MeshObject, posDifference: array[3, float]) =
-    this.pos = this.pos + posDifference
+    this.pos = this.pos >+ posDifference
     this.updateWldSpaceVertexTable()
 
 proc changeRotation*(this: var MeshObject, rotDifference: array[3, float]) =
-    this.rot = this.rot + rotDifference
+    this.rot = this.rot >+ rotDifference
     for i in 0 .. 2:
         this.rotDeg[i] = d(this.rot[i])
     this.updateWldSpaceVertexTable()
 
 proc changeScale*(this: var MeshObject, sclDifference: array[3, float]) =
-    this.scl = this.scl + sclDifference
+    this.scl = this.scl >+ sclDifference
     this.updateWldSpaceVertexTable()
 
 proc setPosition*(this: var MeshObject, newPos: array[3, float]) =
@@ -157,15 +166,15 @@ proc initEmpty*(p = [0.0,0.0,0.0], r = [0.0,0.0,0.0], s = [1.0,1.0,1.0]): Empty 
         result.rotDeg[i] = d(result.rot[i])
 
 proc changePosition*(this: var Empty, posDifference: array[3, float]) =
-    this.pos = this.pos + posDifference
+    this.pos = this.pos >+ posDifference
 
 proc changeRotation*(this: var Empty, rotDifference: array[3, float]) =
-    this.rot = this.rot + rotDifference
+    this.rot = this.rot >+ rotDifference
     for i in 0 .. 2:
         this.rotDeg[i] = d(this.rot[i])
 
 proc changeScale*(this: var Empty, sclDifference: array[3, float]) =
-    this.scl = this.scl + sclDifference
+    this.scl = this.scl >+ sclDifference
 
 proc setPosition*(this: var Empty, newPos: array[3, float]) =
     this.pos = newPos
@@ -191,21 +200,21 @@ type
         nearZ*: float
         farZ*: float
 
-proc initCamera*(p = [0.0,0.0,0.0], r = [0.0,0.0,0.0], s = [1.0,1.0,1.0], f = r(30), shiftX = 0.0, shiftY=0.0, nZ = 0.1, fZ = 5.0): Camera =
+proc initCamera*(p = [0.0,0.0,0.0], r = [0.0,0.0,0.0], s = [1.0,1.0,1.0], f = r(90), shiftX = 0.0, shiftY=0.0, nZ = 0.1, fZ = 5.0): Camera =
     result = Camera(pos: p, rot: r, rotDeg : r, scl: s, fov: f, sX: shiftX, sY: shiftY, nearz: nZ, farZ: fZ) 
     for i in 0 .. 2:
         result.rotDeg[i] = d(result.rot[i])
 
 proc changePosition*(this: var Camera, posDifference: array[3, float]) =
-    this.pos = this.pos + posDifference
+    this.pos = this.pos >+ posDifference
 
 proc changeRotation*(this: var Camera, rotDifference: array[3, float]) =
-    this.rot = this.rot + rotDifference
+    this.rot = this.rot >+ rotDifference
     for i in 0 .. 2:
         this.rotDeg[i] = d(this.rot[i])
 
 proc changeScale*(this: var Camera, sclDifference: array[3, float]) =
-    this.scl = this.scl + sclDifference
+    this.scl = this.scl >+ sclDifference
 
 proc setPosition*(this: var Camera, newPos: array[3, float]) =
     this.pos = newPos
@@ -244,7 +253,7 @@ proc initScreen*(w,h: int): Screen =
 proc drawPixel*(this: var Screen, point2d: array[2, int], color: ColorRGB) =
     let x = point2D[0]
     let y = point2D[1]
-    if x < this.height and y < this.height and x >= 0 and y >= 0:
+    if x < this.width and y < this.height and x >= 0 and y >= 0:
         this.pixels[x,y] = color
 
 proc drawLine*(this: var Screen, point0, point1: array[2,int], color: ColorRGB) =
@@ -282,8 +291,8 @@ proc clear*(this: var Screen) =
 type
     Scene* = object
         objectCollection*: seq[ptr MeshObject]
-        backgroundColor: ColorRGB
-        backfaceCulling: bool
+        backgroundColor*: ColorRGB
+        backfaceCulling*: bool
 
 proc initScene*(bgColor = rgb(0, 0, 0), bfCulling = true): Scene =
     result = Scene(backgroundColor: bgColor, backfaceCulling: bfCulling)
@@ -299,14 +308,16 @@ proc setBackfaceCulling*(this: var Scene, isOn: bool) =
 
 # ---------------------------- Pipeline functions ---------------------------- #
 proc cameraSpace*(vertex: array[3, float], camera: Camera): array[4,float] =
-    result = dUp(vertex-camera.pos) ** rotationMatrix(camera.rot)
+    result = dUp(vertex >- camera.pos) ** rotationMatrix(camera.rot)
 
 proc clipSpace*(camSpaceVertex: array[4,float], camera: Camera, screen: Screen): array[4,float] =
-    var projectionMatrix = [
-        [-(tan(camera.fov/2)),0.0,0.0,0.0],
-        [0.0,(tan(camera.fov/2)*screen.aspectRatio),0.0,0.0],
-        [0.0,0.0,((camera.nearZ+camera.farZ)/(camera.farZ-camera.nearZ)),1.0],
-        [0.0,0.0,((2*camera.nearZ*camera.farZ)/(camera.nearZ-camera.farZ)),0.0]]
+    let projectionMatrix = [
+        [(tan(camera.fov/2.0)), 0.0, 0.0, 0.0],
+        [0.0, (-tan(camera.fov/2.0)*screen.aspectRatio), 0.0, 0.0],
+        [0.0, 0.0, ((camera.nearZ+camera.farZ)/(camera.farZ-camera.nearZ)), 1.0],
+        [0.0, 0.0, ((2.0*camera.nearZ*camera.farZ)/(camera.nearZ-camera.farZ)), 0.0]]
+
+    echo projectionMatrix
 
     result = camSpaceVertex ** projectionMatrix
 

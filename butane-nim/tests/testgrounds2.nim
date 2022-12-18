@@ -1,12 +1,12 @@
 # me learning how pointers work
 
-var
-    x : int = 5
-    y : ptr int = x.addr
+# var
+#     x : int = 5
+#     y : ptr int = x.addr
 
-echo "x:",x," y:",y[]
-x += 10
-echo "x:",x," y:",y[]
+# echo "x:",x," y:",y[]
+# x += 10
+# echo "x:",x," y:",y[]
 
 # This example shows how to draw the surface of a control.
 
@@ -46,3 +46,36 @@ echo "x:",x," y:",y[]
 
 # window.show()
 # app.run()
+
+import sequtils, strutils
+
+# Define a function that multiplies two matrices together
+proc matrixMultiply(matrixA, matrixB: seq[seq[float]]): seq[seq[float]] =
+  # Define the resulting matrix, which will have the same number of rows as matrixA
+  # and the same number of columns as matrixB
+  for i in 0..<result.len:
+    for j in 0..<result[i].len:
+      result[i][j] = 0
+      
+  # Multiply each element of matrixA by the corresponding element in matrixB,
+  # and add the results together to get the value for the resulting matrix
+  for i in 0..<matrixA.len:
+    for j in 0..<matrixB[0].len:
+      for k in 0..<matrixA[0].len:
+        result[i][j] += matrixA[i][k] * matrixB[k][j]
+        
+  # Return the resulting matrix
+  return result
+
+
+# Define some sample matrices
+let matrixA = @[[1, 2], [3, 4]]
+let matrixB = @[[5, 6], [7, 8]]
+
+# Multiply the matrices together
+let res = matrixMultiply(matrixA, matrixB)
+
+# Print the resulting matrix
+echo "Result: "
+for row in res:
+    echo row
