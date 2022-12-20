@@ -128,7 +128,7 @@ proc normalize*[E](v: RowVector[E]): RowVector[E] =
     result = v/mag(v)
 
 # --------------------------- submatrix + subvector -------------------------- #
-# proc submatrix*[R,C](source: Matrix, sub: Matrix[R,C], startRow, startCol: int): Matrix =
+# proc submatrix*[R,C](source: Matrix, sub: Matrix[R,C], startRow, startCol: int): Matrix[] =
 #     if (startCol+subCols-1)>source.cols() or (startRow+subRows-1)>source.rows():
 #         echo "error: submatrix is out of bounds of source matrix, returning blank"
 #         return Matrix[subRows, subCols]
