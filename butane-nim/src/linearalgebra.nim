@@ -159,7 +159,7 @@ proc `**`*[M, P](a: Matrix[M, P], b: RowVector[M]): RowVector[P] =
     result = toRowVector(matmul(a,toMatrix(b)))
 
 # -------------------------------- determinant ------------------------------- #
-proc det*[E](m: Matrix[E,E]): float =
+proc det*[D](m: Matrix[D,D]): float =
     result = 0.0
 
 
@@ -167,8 +167,8 @@ proc det*[E](m: Matrix[E,E]): float =
 
 
 
-var rowVec: RowVector[2] = [3.0,4.0]
-var colVec: ColVector[2] = [3.0,4.0]
+var rowVec: RowVector[4] = [1.0,2.0,3.0,4.0]
+var colVec: ColVector[4] = [1.0,2.0,3.0,4.0]
 
 var mat: Matrix[4,4] 
 
