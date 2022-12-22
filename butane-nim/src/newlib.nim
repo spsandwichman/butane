@@ -67,3 +67,15 @@ proc scaleVector*(vector, scale, origin: Vector[3]): Vector[3] =
     result = dDown(makeScaleMatrix(scale) ** dUp(vector))
 
 # ------------------------------ classes an shit ----------------------------- #
+type
+    MeshObject* = object
+        pos*: Vector[3]
+        rot*: Vector[3]
+        scl*: Vector[3]
+        objSpaceVertexTable*: seq[Vector[3]]
+        wldSpaceVertexTable*: seq[Vector[3]]
+        triTable*: seq[array[3,int]]
+
+proc updateWldSpaceVertexTable*(this: var MeshObject) =
+    for v in 0..(len(this.wldSpaceVertexTable)-1):
+        this.wldSpaceVertexTable(v) = makeTranslationMatrix(this.pos) ** makeRotationMatrix(this.rot)
