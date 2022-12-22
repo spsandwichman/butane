@@ -1,14 +1,14 @@
 import strfmt,  std/math
 
 type Matrix*[R,C: static(int)] = array[R, array[C,float]] #R: number of rows, C: number of columns
-type ColVector*[E: static(int)] = array[E, float]
+type Vector*[E: static(int)] = array[E, float]
 type RowVector*[E: static(int)] = array[E, float]
 
 proc toMatrix*[E](vector: RowVector[E]): Matrix[1,E] = #converts RowVector object to Matrix representation
     for i in 0..(E-1):
         result[0][i] = vector[i]
     
-proc toMatrix*[E](vector: ColVector[E]): Matrix[E,1] = #converts  ColVector object to Matrix representation
+proc toMatrix*[E](vector: Vector[E]): Matrix[E,1] = #converts  Vector object to Matrix representation
     for i in 0..(E-1):
         result[i][0] = vector[i]
 
@@ -16,7 +16,7 @@ proc toRowVector*[E](matrix: Matrix[1,E]): RowVector[E] =
     for i in 0..(E-1):
         result[i] = matrix[0][i]
 
-proc toColVector*[E](matrix: Matrix[E,1]): ColVector[E] =
+proc toVector*[E](matrix: Matrix[E,1]): Vector[E] =
     for i in 0..(E-1):
         result[i] = matrix[i][0]
 
@@ -28,7 +28,7 @@ proc `$`*(m: Matrix): string =
             result.add val.format("8.4f")
     result.add "]]"
 
-proc `$`*(a: ColVector): string = #its really for both column vectors and row vectors, just dont touch it
+proc `$`*(a: Vector): string = #its really for both column vectors and row vectors, just dont touch it
     let v = toMatrix(a)
     result = "[["
     for r in v:
@@ -51,7 +51,7 @@ proc `*`*[E](s: float, v: RowVector[E]): RowVector[E] =
     for i in 0..(E-1):
         result[i] = s*v[i]
 
-proc `*`*[E](s: float, v: ColVector[E]): ColVector[E] =
+proc `*`*[E](s: float, v: Vector[E]): Vector[E] =
     for i in 0..(E-1):
         result[i] = s*v[i]
 
@@ -64,7 +64,7 @@ proc `/`*[E](v: RowVector[E], s: float): RowVector[E] =
     for i in 0..(E-1):
         result[i] = v[i]/s
 
-proc `/`*[E](v: ColVector[E], s: float): ColVector[E] =
+proc `/`*[E](v: Vector[E], s: float): Vector[E] =
     for i in 0..(E-1):
         result[i] = v[i]/s
 
@@ -78,7 +78,7 @@ proc `+`*[E](v1: RowVector[E], v2: RowVector[E]): RowVector[E] =
     for i in 0..(E-1):
         result[i] = v1[i] + v2[i]
 
-proc `+`*[E](v1: ColVector[E], v2: ColVector[E]): ColVector[E] =
+proc `+`*[E](v1: Vector[E], v2: Vector[E]): Vector[E] =
     for i in 0..(E-1):
         result[i] = v1[i] + v2[i]
 
@@ -91,7 +91,7 @@ proc `-`*[E](v1: RowVector[E], v2: RowVector[E]): RowVector[E] =
     for i in 0..(E-1):
         result[i] = v1[i] - v2[i]
 
-proc `-`*[E](v1: ColVector[E], v2: ColVector[E]): ColVector[E] =
+proc `-`*[E](v1: Vector[E], v2: Vector[E]): Vector[E] =
     for i in 0..(E-1):
         result[i] = v1[i] - v2[i]
 
@@ -102,16 +102,16 @@ proc t*[R,C](m: Matrix[R,C]): Matrix[C,R] =
         for j in 0..(C-1):
             result[j][i] = m[i][j]
 
-proc t*[E](v: RowVector[E]): ColVector[E] =
+proc t*[E](v: RowVector[E]): Vector[E] =
     for i in 0..(E-1):
         result[i] = v[i]
 
-proc t*[E](v: ColVector[E]): RowVector[E] =
+proc t*[E](v: Vector[E]): RowVector[E] =
     for i in 0..(E-1):
         result[i] = v[i]
 
 # --------------------------------- magnitude -------------------------------- #
-proc mag*[E](v: ColVector[E]): float =
+proc mag*[E](v: Vector[E]): float =
     for i in 0..(E-1):
         result += (v[i])^2
     result = sqrt(result)
@@ -121,12 +121,22 @@ proc mag*[E](v: RowVector[E]): float =
         result += (v[i])^2
     result = sqrt(result)
 
-proc normalize*[E](v: ColVector[E]): ColVector[E] =
+proc normalize*[E](v: Vector[E]): Vector[E] =
     result = v/mag(v)
 
 proc normalize*[E](v: RowVector[E]): RowVector[E] =
     result = v/mag(v)
 
+# --------------------------- cross and dot product -------------------------- #
+proc cross*(a,b: Vector[3]): Vector[3] =
+    result = [a[1]*b[2] - a[2]*b[1], a[2]*b[1] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]]
+
+proc dot*[E](a,b: Vector[E]): float =
+    for i in 0..(E-1):
+        result += a[i]*b[i]
+
+proc triNormal*(v0,v1,v2: Vector[3]) : Vector[3] =
+    result = normalize(cross((v0-v1),(v1-v2)))
 # --------------------------- submatrix + subvector -------------------------- #
 # proc submatrix*[R,C](source: Matrix, sub: Matrix[R,C], startRow, startCol: int): Matrix[] =
 #     if (startCol+subCols-1)>source.cols() or (startRow+subRows-1)>source.rows():
@@ -152,24 +162,8 @@ proc matmul*[M, P, N](a: Matrix[M, P], b: Matrix[P, N]): Matrix[M, N] =
 proc `**`*[M, P, N](a: Matrix[M, P], b: Matrix[P, N]): Matrix[M, N] =
     result = matmul(a,b)
 
-proc `**`*[M, P](a: Matrix[M, P], b: ColVector[P]): ColVector[M] =
-    result = toColVector(matmul(a,toMatrix(b)))
+proc `**`*[M, P](a: Matrix[M, P], b: Vector[P]): Vector[M] =
+    result = toVector(matmul(a,toMatrix(b)))
 
 proc `**`*[M, P](a: Matrix[M, P], b: RowVector[M]): RowVector[P] =
     result = toRowVector(matmul(a,toMatrix(b)))
-
-# -------------------------------- determinant ------------------------------- #
-proc det*[E](m: Matrix[E,E]): float =
-    result = 0.0
-
-
-
-
-
-
-var rowVec: RowVector[2] = [3.0,4.0]
-var colVec: ColVector[2] = [3.0,4.0]
-
-var mat: Matrix[4,4] 
-
-echo mat
