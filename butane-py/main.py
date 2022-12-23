@@ -31,9 +31,10 @@ def main():
 	#scene.addObjectToScene(Plane)
 	#scene.addObjectToScene(Cube)
 	#scene.addObjectToScene(Pyramid)
-	scene.addObjectToScene(Igloo)
+	#scene.addObjectToScene(Igloo)
 	#scene.addObjectToScene(Suzanne)
-	scene.addObjectToScene(Axis)
+	scene.addObjectToScene(Datboi)
+	#scene.addObjectToScene(Axis)
 	scene.setBackground(array([10,10,10]))
 	#scene.setBackfaceCulling(False)
 
@@ -89,8 +90,10 @@ def main():
 
 		#Cube.rotate(array([0,0,-0.01]))
 		#Pyramid.rotate(array([0,0,0.03]))
-		Igloo.rotate(array([0.0,0.0,0.07]))
-		#Suzanne.rotate(array([0.0,0.0,0.03]))
+		#Igloo.rotate(array([0.0,0.0,0.07]))
+		# Suzanne.rotate(array([0.1,0.0,0.05]))
+		# Suzanne.scale(array([1.05,1.05,1.0]))
+		Datboi.rotate(array([0.0,0.0,0.05]))
 
 
 		pg.surfarray.blit_array(pgscreen, screen.pixels)

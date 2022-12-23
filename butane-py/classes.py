@@ -367,3 +367,5 @@ Igloo = LoadObjectfromOBJ("igloo.obj")
 Axis = LoadObjectfromOBJ("axis.obj")
 
 Grid = LoadObjectfromOBJ("grid.obj")
+
+Datboi = LoadObjectfromOBJ("datboi.obj")
